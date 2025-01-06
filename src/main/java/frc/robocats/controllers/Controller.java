@@ -4,8 +4,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /** An interface to apply universal Controls.
  * To implement a controller you must define how each button is processed.
- * @author El Campus - 2026
- * @since 2024-09-29
+ * @author El Campus - grad 2026
+ * @since 2025-01-06
  */
 public interface Controller {
   /**@return a trigger that is called when the A button is pressed. */
@@ -30,15 +30,19 @@ public interface Controller {
   public Trigger onRightStickIn();
 
   /**
-   * @param threshold a number bewtween 0 and 1 (not 0). defines how far you have to press the Trigger
+   * @param threshold a number bewtween 0 and 1 (not 0). defines how far you have to press the Trigger for it to activate
    * @return A trigger that is called when that threshold is reached
    */
   public Trigger onLeftTrigger(double threshold);
   /**
-   * @param threshold a number bewtween 0 and 1 (not 0). defines how far you have to press the Trigger
+   * @param threshold a number bewtween 0 and 1 (not 0). defines how far you have to press the Trigger for it to activate
    * @return A trigger that is called when that threshold is reached
    */
   public Trigger onRightTrigger(double threshold);
+  /** @return The percent of depression on the left trigger. */
+  public double getLeftTrigger();
+  /** @return  The percent of depression on the right trigger. */
+  public double getRightTrigger();
 
   /**@return a number between -1, 1 representing where the Left joystick is (left to right) */
   public double getLeftX();
@@ -68,8 +72,17 @@ public interface Controller {
   /**@return a trigger that is called when nothing is pressed on the D-pad */
   public Trigger onDPadNull();
   /**@return which way the directional pad is being pressed
-   * up: 0; up-right:45, left:90, etc
+   * up: 0; up-right:45, right:90, etc
    * not being press returns -1
    */
   public int getDpadAngle();
+
+  /** Do not use, has not been implemented. Requires implementor to Override the JavaDoc */
+  public Trigger on1();
+  /** Do not use, has not been implemented. Requires implementor to Override the JavaDoc */
+  public Trigger on2();
+  /** Do not use, has not been implemented. Requires implementor to Override the JavaDoc */
+  public Trigger on3();
+  /** Do not use, has not been implemented. Requires implementor to Override the JavaDoc */
+  public Trigger on4();
 }

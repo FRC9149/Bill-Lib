@@ -8,9 +8,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**A class that allows for input with a Logitech controller
  * As used in the first 2 years of the season.
- * (maybe more/less, but I can't see into the future)
- * @author El Campus - 2026
- * @since 2024-09-29
+ * (maybe more, but I can't see into the future)
+ * @author El Campus - grad 2026
+ * @since 2025-01-06
  */
 public class Logitech implements Controller {
   //The gamepad that we are recieving inputs from
@@ -22,8 +22,13 @@ public class Logitech implements Controller {
    */
   public Logitech(int gamepadPort) {
     //when gamepad is in Xbox mode, there are 6 axises (4 in D mode)
+    //We can use this to Determine what mode we are in
     // () -> is a supplier or lambda. it's used essentially just a function that you can use as a variable
     isX = () -> gamepad.getAxisCount() == 6;
+    //every time we call isX.getAsBoolean(); we are essentially calling 
+    // bool function() {
+    //   return gamepad.getAxisCount() == 6;
+    // }
   }
 
   public Trigger onA() {
@@ -79,6 +84,14 @@ public class Logitech implements Controller {
     if( !isX.getAsBoolean() ) { return new JoystickButton(gamepad, 8); }
     return new Trigger(() -> gamepad.getRightTriggerAxis() > threshold);
   }
+  public double onLeftTrigger() {
+    if ( !isX.getAsBoolean() ) {return onLeftTrigger(0.1).getAsBoolean() ? 1.0 : 0.0; }
+    return gamepad.getLeftTriggerAxis();
+  }
+  public double onRightTrigger() {
+    if ( !isX.getAsBoolean() ) {return onRightTrigger(0.1).getAsBoolean() ? 1.0 : 0.0; }
+    return gamepad.getRightTriggerAxis();
+  }
 
   public double getLeftX()  { return gamepad.getLeftX(); }
   public double getLeftY()  { return gamepad.getLeftY(); }
@@ -95,4 +108,11 @@ public class Logitech implements Controller {
   public Trigger onDPadUpLeft()   { return new Trigger(() -> gamepad.getPOV() == 315); }
   public Trigger onDPadNull()     { return new Trigger(() -> gamepad.getPOV() == -1); }
   public int getDpadAngle() { return gamepad.getPOV(); }
+
+  //always return false
+  //making these triggers obsolete
+  public Trigger on1(){ return new Trigger(() -> false); }
+  public Trigger on2(){ return new Trigger(() -> false); }
+  public Trigger on3(){ return new Trigger(() -> false); }
+  public Trigger on4(){ return new Trigger(() -> false); }
 }
