@@ -1,5 +1,4 @@
-package frc.robocats;
+package java.frc.robocats;
 
 public class Main {
-  
 }

@@ -1,4 +1,4 @@
-package frc.robocats;
+package java.frc.robocats;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
