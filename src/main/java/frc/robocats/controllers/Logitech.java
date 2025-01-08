@@ -2,6 +2,7 @@ package frc.robocats.controllers;
 
 import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -115,4 +116,40 @@ public class Logitech implements Controller {
   public Trigger on2(){ return new Trigger(() -> false); }
   public Trigger on3(){ return new Trigger(() -> false); }
   public Trigger on4(){ return new Trigger(() -> false); }
+
+  @Override
+  public double getLeftTrigger() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'getLeftTrigger'");
+  }
+
+  @Override
+  public double getRightTrigger() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'getRightTrigger'");
+  }
+
+  @Override
+  public Trigger on5() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'on5'");
+  }
+
+  @Override
+  public Trigger on6() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'on6'");
+  }
+
+  @Override
+  public Trigger on7() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'on7'");
+  }
+
+  @Override
+  public Trigger on8() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'on8'");
+  }
 }
