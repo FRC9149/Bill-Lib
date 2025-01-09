@@ -2,7 +2,6 @@ package frc.robocats.controllers;
 
 import java.util.function.BooleanSupplier;
 
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -54,12 +53,8 @@ public class Logitech implements Controller {
     //Y is always 4 (for some reason)
     return new JoystickButton(gamepad, 4);
   }
-  public Trigger onLeftBumper() {
-    return new JoystickButton(gamepad, 5);
-  }
-  public Trigger onRightBumper() {
-    return new JoystickButton(gamepad, 6);
-  }
+  public Trigger onLeftBumper() { return new JoystickButton(gamepad, 5); }
+  public Trigger onRightBumper() { return new JoystickButton(gamepad, 6); }
   public Trigger onBack() {
     int buttonNumber = isX.getAsBoolean() ? 7 : 9;
     return new JoystickButton(gamepad, buttonNumber);
@@ -85,71 +80,39 @@ public class Logitech implements Controller {
     if( !isX.getAsBoolean() ) { return new JoystickButton(gamepad, 8); }
     return new Trigger(() -> gamepad.getRightTriggerAxis() > threshold);
   }
-  public double onLeftTrigger() {
+  public double getLeftTrigger() {
     if ( !isX.getAsBoolean() ) {return onLeftTrigger(0.1).getAsBoolean() ? 1.0 : 0.0; }
     return gamepad.getLeftTriggerAxis();
   }
-  public double onRightTrigger() {
+  public double getRightTrigger() {
     if ( !isX.getAsBoolean() ) {return onRightTrigger(0.1).getAsBoolean() ? 1.0 : 0.0; }
     return gamepad.getRightTriggerAxis();
   }
 
-  public double getLeftX()  { return gamepad.getLeftX(); }
-  public double getLeftY()  { return gamepad.getLeftY(); }
+  public double getLeftX()  { return gamepad.getLeftX();  }
+  public double getLeftY()  { return gamepad.getLeftY();  }
   public double getRightX() { return gamepad.getRightX(); }
   public double getRightY() { return gamepad.getRightY(); }
 
-  public Trigger onDPadUp()       { return new Trigger(() -> gamepad.getPOV() == 0); }
-  public Trigger onDPadUpRight()  { return new Trigger(() -> gamepad.getPOV() == 45); }
-  public Trigger onDPadRight()    { return new Trigger(() -> gamepad.getPOV() == 90); }
-  public Trigger onDPadDownRight(){ return new Trigger(() -> gamepad.getPOV() == 135); }
-  public Trigger onDPadDown()     { return new Trigger(() -> gamepad.getPOV() == 180); }
-  public Trigger onDPadDownLeft() { return new Trigger(() -> gamepad.getPOV() == 225); }
-  public Trigger onDPadLeft()     { return new Trigger(() -> gamepad.getPOV() == 270); }
-  public Trigger onDPadUpLeft()   { return new Trigger(() -> gamepad.getPOV() == 315); }
-  public Trigger onDPadNull()     { return new Trigger(() -> gamepad.getPOV() == -1); }
-  public int getDpadAngle() { return gamepad.getPOV(); }
+  public Trigger onDPadUp()        { return new Trigger(() -> gamepad.getPOV() == 0  ); }
+  public Trigger onDPadUpRight()   { return new Trigger(() -> gamepad.getPOV() == 45 ); }
+  public Trigger onDPadRight()     { return new Trigger(() -> gamepad.getPOV() == 90 ); }
+  public Trigger onDPadDownRight() { return new Trigger(() -> gamepad.getPOV() == 135); }
+  public Trigger onDPadDown()      { return new Trigger(() -> gamepad.getPOV() == 180); }
+  public Trigger onDPadDownLeft()  { return new Trigger(() -> gamepad.getPOV() == 225); }
+  public Trigger onDPadLeft()      { return new Trigger(() -> gamepad.getPOV() == 270); }
+  public Trigger onDPadUpLeft()    { return new Trigger(() -> gamepad.getPOV() == 315); }
+  public Trigger onDPadNull()      { return new Trigger(() -> gamepad.getPOV() == -1 ); }
+  public int     getDpadAngle()    { return gamepad.getPOV(); }
 
   //always return false
   //making these triggers obsolete
-  public Trigger on1(){ return new Trigger(() -> false); }
-  public Trigger on2(){ return new Trigger(() -> false); }
-  public Trigger on3(){ return new Trigger(() -> false); }
-  public Trigger on4(){ return new Trigger(() -> false); }
-
-  @Override
-  public double getLeftTrigger() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getLeftTrigger'");
-  }
-
-  @Override
-  public double getRightTrigger() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getRightTrigger'");
-  }
-
-  @Override
-  public Trigger on5() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'on5'");
-  }
-
-  @Override
-  public Trigger on6() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'on6'");
-  }
-
-  @Override
-  public Trigger on7() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'on7'");
-  }
-
-  @Override
-  public Trigger on8() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'on8'");
-  }
+  public Trigger on1() { return new Trigger(() -> false); }
+  public Trigger on2() { return new Trigger(() -> false); }
+  public Trigger on3() { return new Trigger(() -> false); }
+  public Trigger on4() { return new Trigger(() -> false); }
+  public Trigger on5() { return new Trigger(() -> false); }
+  public Trigger on6() { return new Trigger(() -> false); }
+  public Trigger on7() { return new Trigger(() -> false); }
+  public Trigger on8() { return new Trigger(() -> false); }
 }
