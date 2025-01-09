@@ -1,4 +1,4 @@
-package java.frc.robocats.LED;
+package frc.robocats.LED;
 
 import java.util.function.BiConsumer;
 
@@ -16,12 +16,11 @@ public class LedStrip {
      */
     public LedStrip(int port, int length) {
         led = new AddressableLED(port);
-        ledBuffer = new AdressableLEDBuffer(length);
+        ledBuffer = new AddressableLEDBuffer(length);
         led.setLength(length);
     }
 
     /** Sets a led to a certain color
-     * 
      * @param index The index of the led you want to change
      * @param r The red value 0-255
      * @param g The Green value 0-255
@@ -32,7 +31,6 @@ public class LedStrip {
         led.setData(ledBuffer);
     }
     /** Takes in a BiConsumer that gets applied to all the led pixels.
-     * 
      * @param f The BiConsumer that takes in the index of the pixel and the rgb values of the pixel
      */
     public void foreach(BiConsumer<Integer, int[]> f) {
@@ -52,7 +50,6 @@ public class LedStrip {
     }
 
     /** Applys a pattern to the led buffer
-     * 
      * @param pattern The led pattern you wish to apply
      */
     public void applyLEDPattern(LEDPattern pattern) {
@@ -60,7 +57,6 @@ public class LedStrip {
         led.setData(ledBuffer);
     }
 
-    /** stops output to the led strip
-     */
+    /** stops output to the led strip*/
     public void stop() { led.stop();}
 }
