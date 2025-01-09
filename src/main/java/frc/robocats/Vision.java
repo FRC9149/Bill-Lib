@@ -1,11 +1,12 @@
-package java.frc.robocats;
+package frc.robocats;
 
+import java.util.List;
+import java.util.function.Function;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.PIDController;
 
 /**Class for processing images and finding targets
@@ -18,6 +19,7 @@ public class Vision {
   double cameraHeight, cameraPitch, maxSpeed, maxAngularSpeed;
   PIDController pid;
   AprilTagFieldLayout aprilTags;
+  List<PhotonPipelineResult> results;
   /**
    * @param cameraBroadcastingName the broadcasting name that the coprossesor is using
    * @param camreaHeight_Meters how high the camera is off the ground
@@ -25,51 +27,49 @@ public class Vision {
    * @param turningPid the pid controller that should be applied to the rotation functions
    * @param tagLayout The Apriltag field layout for the current game
    */
-  public Vision(String cameraBroadcastingName, double camreaHeight_Meters, double cameraPitch_Radians, PIDController turningPid, AprilTagFields tagLayout) {
-    aprilTags = tagLayout.loadAprilTagLayoutField();
+  public Vision(String cameraBroadcastingName, double camreaHeight_Meters, double cameraPitch_Radians, PIDController turningPid) {
+    //aprilTags = AprilTagFields.k2025ReefScape;
     cameraHeight = camreaHeight_Meters;
     cameraPitch = cameraPitch_Radians;
     pid = turningPid;
     camera = new PhotonCamera(cameraBroadcastingName);
   }
 
-  /** Find how to turn to align with a certain apriltag.
-   * Should be applied continuously
-   * @param tagId the id of the April tag to turn to
-   * @return the turning speed to align with the tag
-   */
-  public double turnToTag(int tagId) {
-    PhotonPipelineResult result = camera.getLatestResult();
-    //check if there are no targets (for readability sake)
-    if(!result.hasTargets()) return Double.MAX_VALUE;
-
-    //for each target, if the id is correct, start turning towards that one
-    for(PhotonTrackedTarget target : result.getTargets()) {
-      if(target.getFiducialId() == tagId) {
-        return pid.calculate(-1.0 * target.getYaw() * maxAngularSpeed);
-      }
-    }
-    return Double.MAX_VALUE;
+  public double getPitch() {
+    return forResults( (result) -> {return result.getBestTarget().getPitch();} );
+  }
+  public double getArea() {
+    return forResults( (result) -> {return result.getBestTarget().getArea();} );
+  }
+  public double getSkew() {
+    return forResults( (result) -> {return result.getBestTarget().getSkew(); } );
+  }
+  public double getYaw() {
+    return forResults( (result) -> {return result.getBestTarget().getYaw();} );
   }
 
-  public double turnToTarget() {
-    PhotonPipelineResult result = camera.getLatestResult();
-    if(result.hasTargets()) {
-      return pid.calculate(-1 * result.getBestTarget().getYaw() * maxAngularSpeed);
-    }
-    return Double.MAX_VALUE;
-
+  public boolean update() {
+    results = camera.getAllUnreadResults();
+    return !results.isEmpty();
   }
-
+  public PhotonTrackedTarget getBestResult() {
+    return forResults( (result) -> {return result.getBestTarget();} );
+  }
+  public <T> T forResults(Function<PhotonPipelineResult, T> func) {
+    if (!update()) { return null; }
+    for (PhotonPipelineResult result : results) {
+      if (!result.hasTargets()) {continue;}
+      return func.apply(result);
+    }
+    return null;
+  }
 
   /**@returns the id of the best april tag. -1 if there is none */
-  public int getAprilData() {
-    PhotonPipelineResult result = camera.getLatestResult();
-    if(result.hasTargets()) return result.getBestTarget().getFiducialId();
-    return -1;
+  public int getAprilTagId() {
+    if (!update()) { return -1; }
+    return getBestResult().getFiducialId();
   }
 
   /**takes a screenshot. can be found inside the Photon config/settings and exporting. */
   public void screenshot() { camera.takeInputSnapshot(); }
-  public double getLatency() { return camera.getLatestResult().getLatencyMillis() / 1000; }
 }
