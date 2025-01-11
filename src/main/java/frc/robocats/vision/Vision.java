@@ -1,4 +1,4 @@
-package frc.robocats.vision;
+package frc.robot.vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.Pair;
@@ -18,6 +18,9 @@ public class Vision {
     //aprilTags = AprilTagFields.k2025ReefScape;
     camera = cam1;
     camera2 = cam2;
+  }
+  public void x () {
+    
   }
   public Pair<Camera, Camera> getCameras() { return new Pair<Camera, Camera>(camera, camera2); }
 }
