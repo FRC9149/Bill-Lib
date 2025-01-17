@@ -1,6 +1,5 @@
-package frc.robot.vision;
+package frc.robocats.vision;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.Pair;
 
 /**Class for processing images and finding targets
@@ -10,7 +9,6 @@ import edu.wpi.first.math.Pair;
  */ 
 public class Vision {
   private Camera camera, camera2;
-  private AprilTagFieldLayout aprilTags;
   /**
    * @param tagLayout The Apriltag field layout for the current game
    */
@@ -18,9 +16,6 @@ public class Vision {
     //aprilTags = AprilTagFields.k2025ReefScape;
     camera = cam1;
     camera2 = cam2;
-  }
-  public void x () {
-    
   }
   public Pair<Camera, Camera> getCameras() { return new Pair<Camera, Camera>(camera, camera2); }
 }
