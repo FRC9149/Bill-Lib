@@ -76,21 +76,4 @@ public interface Controller {
    * not being press returns -1
    */
   public int getDpadAngle();
-
-  /** Do not use, has not been implemented. Requires implementor to Override the JavaDoc */
-  public Trigger on1();
-  /** Do not use, has not been implemented. Requires implementor to Override the JavaDoc */
-  public Trigger on2();
-  /** Do not use, has not been implemented. Requires implementor to Override the JavaDoc */
-  public Trigger on3();
-  /** Do not use, has not been implemented. Requires implementor to Override the JavaDoc */
-  public Trigger on4();
-  /** Do not use, has not been implemented. Requires implementor to Override the JavaDoc */
-  public Trigger on5();
-  /** Do not use, has not been implemented. Requires implementor to Override the JavaDoc */
-  public Trigger on6();
-  /** Do not use, has not been implemented. Requires implementor to Override the JavaDoc */
-  public Trigger on7();
-  /** Do not use, has not been implemented. Requires implementor to Override the JavaDoc */
-  public Trigger on8();
 }

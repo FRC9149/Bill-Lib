@@ -104,15 +104,4 @@ public class Logitech implements Controller {
   public Trigger onDPadUpLeft()    { return new Trigger(() -> gamepad.getPOV() == 315); }
   public Trigger onDPadNull()      { return new Trigger(() -> gamepad.getPOV() == -1 ); }
   public int     getDpadAngle()    { return gamepad.getPOV(); }
-
-  //always return false
-  //making these triggers obsolete
-  public Trigger on1() { return new Trigger(() -> false); }
-  public Trigger on2() { return new Trigger(() -> false); }
-  public Trigger on3() { return new Trigger(() -> false); }
-  public Trigger on4() { return new Trigger(() -> false); }
-  public Trigger on5() { return new Trigger(() -> false); }
-  public Trigger on6() { return new Trigger(() -> false); }
-  public Trigger on7() { return new Trigger(() -> false); }
-  public Trigger on8() { return new Trigger(() -> false); }
 }
