@@ -1,4 +1,4 @@
-package frc.robocats.controllers;
+package com.robocats.controllers;
 
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * <p>To implement a controller you must define how each button is processed.</p>
  * Each field should return a value, but some functions may be redundant.
  * @author El Campus - grad 2026
+ * @author 404.el.404@gmail.com
  * @since 2025-01-20
  */
 public interface Controller {

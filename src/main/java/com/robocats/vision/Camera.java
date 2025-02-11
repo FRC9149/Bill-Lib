@@ -1,4 +1,4 @@
-package frc.robocats.vision;
+package com.robocats.vision;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;

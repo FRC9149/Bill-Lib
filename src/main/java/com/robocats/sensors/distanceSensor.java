@@ -1,12 +1,12 @@
-package frc.robocats.sensors;
+package com.robocats.sensors;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class distanceSensor extends SubsystemBase {
-  AnalogInput sensor;
-  double tripVal = 4;
+  private AnalogInput sensor;
+  private double tripVal = 4;
 
   /**
    * @param port The port that the sensor is connected to
@@ -25,4 +25,7 @@ public class distanceSensor extends SubsystemBase {
   public void writeVoltage() { SmartDashboard.putNumber("Distance sensor on port: " + sensor.getChannel() + " reads: ", sensor.getVoltage()); }
   /** @return If the sensor detects something */
   public boolean isTripped() { return sensor.getVoltage() > tripVal; }
+  
+  public void setTripValue(double tripValue) { tripVal = tripValue; }
+  public double getTripValue() { return tripVal; }
 }

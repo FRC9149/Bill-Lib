@@ -1,8 +1,14 @@
-package frc.robocats.controllers;
+package com.robocats.controllers;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+/**
+ * A class for a wired ps3 controller
+ * @author El Campus - grad 2026
+ * @author 404.el.404@gmail.com
+ * @since 2025-02-11
+ */
 public class Ps3 implements Controller {
     private XboxController cont;
 

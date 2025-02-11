@@ -1,4 +1,4 @@
-package frc.robocats.controllers;
+package com.robocats.controllers;
 
 import java.util.function.BooleanSupplier;
 
@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * As used in the first 2 years of the season.
  * (maybe more, but I can't see into the future)
  * @author El Campus - grad 2026
+ * @author 404.el.404@gmail.com
  * @since 2025-01-06
  */
 public class Logitech implements Controller {
