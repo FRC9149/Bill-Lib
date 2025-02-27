@@ -59,4 +59,15 @@ public class LedStrip {
 
     /** stops output to the led strip*/
     public void stop() { led.stop();}
+
+    public void setAll(int r, int g, int b) {}
+    public void setRainbow() {}
+    // TODO find a better name for this
+    // should make a line that moves up the led strip
+    //ex:
+    // _____====__________
+    // _________====______
+    // _____________====__
+    // ...
+    public void setLoading() {}
 }
