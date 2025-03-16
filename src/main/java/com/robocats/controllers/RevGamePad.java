@@ -9,42 +9,22 @@ public class RevGamePad implements Controller {
         joystick = new Joystick(port);
     }
 
-    public Trigger onA() {
-        return new Trigger(() -> joystick.getRawButton(0));
-    }
-    public Trigger onB() {
-        return new Trigger(() -> joystick.getRawButton(1));
-    }
-    public Trigger onX() {
-        return new Trigger(() -> joystick.getRawButton(2));
-    }
-    public Trigger onY() {
-        return new Trigger(() -> joystick.getRawButton(3));
-    }
-    public Trigger onLeftBumper() {
-        return new Trigger(() -> joystick.getRawButton(4));
-    }
-    public Trigger onRightBumper() {
-        return new Trigger(()-> joystick.getRawButton(5));
-    }
-    public Trigger onBack() {
-        return new Trigger(()-> joystick.getRawButton(6));
-    }
-    public Trigger onStart() {
-        return new Trigger(()-> joystick.getRawButton(7));
-    }
-    public Trigger onLeftStickIn() {
-        return new Trigger(()-> joystick.getRawButton(8));
-    }
-    public Trigger onRightStickIn() {
-        return new Trigger(()-> joystick.getRawButton(9));
-    }
-    public Trigger onLeftTrigger(double threshold) {
-        return new Trigger(() -> joystick.getRawAxis(2) >= threshold);
-    }
-    public Trigger onRightTrigger(double threshold) {
-        return new Trigger(() -> joystick.getRawAxis(3) >= threshold);
-    }
+    /**The X Button */
+    public Trigger onA() { return new Trigger(() -> joystick.getRawButton(1)); }
+    /**The O Button */
+    public Trigger onB() { return new Trigger(() -> joystick.getRawButton(2)); }
+    /**The Sqr Button */
+    public Trigger onX() { return new Trigger(() -> joystick.getRawButton(3)); }
+    /**The ▲ Button */
+    public Trigger onY() { return new Trigger(() -> joystick.getRawButton(4)); }
+    public Trigger onLeftBumper() { return new Trigger(() -> joystick.getRawButton(5)); }
+    public Trigger onRightBumper() { return new Trigger(()-> joystick.getRawButton(6)); }
+    public Trigger onBack() { return new Trigger(()-> joystick.getRawButton(7)); }
+    public Trigger onStart() { return new Trigger(()-> joystick.getRawButton(8)); }
+    public Trigger onLeftStickIn() { return new Trigger(()-> joystick.getRawButton(9)); }
+    public Trigger onRightStickIn() { return new Trigger(()-> joystick.getRawButton(10)); }
+    public Trigger onLeftTrigger(double threshold) { return new Trigger(() -> joystick.getRawAxis(2) >= threshold); }
+    public Trigger onRightTrigger(double threshold) { return new Trigger(() -> joystick.getRawAxis(3) >= threshold); }
     public double getLeftTrigger() {
         return joystick.getRawAxis(2);
     }
@@ -55,13 +35,13 @@ public class RevGamePad implements Controller {
         return joystick.getRawAxis(0);
     }
     public double getLeftY() {
-        return joystick.getRawAxis(1);
+        return -joystick.getRawAxis(1);
     }
     public double getRightX() {
         return joystick.getRawAxis(4);
     }
     public double getRightY() {
-        return joystick.getRawAxis(5);
+        return -joystick.getRawAxis(5);
     }
     public Trigger onDPadUp() {
         return new Trigger(() -> joystick.getPOV() == 0);
