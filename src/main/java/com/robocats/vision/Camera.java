@@ -24,6 +24,7 @@ public class Camera {
    */
   public Camera(String cameraBroadcastingName, Transform3d cameraTransform) {
     camera = new PhotonCamera(cameraBroadcastingName);
+    System.out.println(camera.getCameraTable().containsKey("April_Camera"));
     transform = cameraTransform;
   }
   
@@ -61,10 +62,6 @@ public class Camera {
   /** @return The yaw of the current best target; -1 if there are no targets */
   public double getYaw() {
     return isResultUsable() ? result.getBestTarget().getYaw() : -1;
-  }
-  /** @return The id of the best target. -1 if there is none */
-  public int getAprilTagId() {
-    return isResultUsable() ? result.getBestTarget().fiducialId : -1;
   }
 
   /**
