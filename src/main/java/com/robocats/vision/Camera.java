@@ -2,6 +2,7 @@ package com.robocats.vision;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
+import org.photonvision.struct.PhotonTrackedTargetSerde;
 import org.photonvision.targeting.PhotonPipelineResult;
 
 import edu.wpi.first.math.geometry.Transform3d;
@@ -24,7 +25,6 @@ public class Camera {
    */
   public Camera(String cameraBroadcastingName, Transform3d cameraTransform) {
     camera = new PhotonCamera(cameraBroadcastingName);
-    System.out.println(camera.getCameraTable().containsKey("April_Camera"));
     transform = cameraTransform;
   }
   
@@ -70,9 +70,9 @@ public class Camera {
    * Aka: Should be called before using data (but not while parsing data)
    */
   public void update() { 
-    var results = camera.getAllUnreadResults().toArray(new PhotonPipelineResult[0]);
-    System.out.println(camera.isConnected());
-    result = results.length == 0 ? null : results[results.length-1];
+    // var results = camera.getAllUnreadResults().toArray(new PhotonPipelineResult[0]);
+    // result = results.length == 0 ? null : results[results.length-1];
+    result = camera.getLatestResult();
   }
 
   /**
@@ -81,7 +81,14 @@ public class Camera {
   public boolean isResultUsable() {
     // if the camera was updated
     // and if the camera see's something
-    return result != null && result.hasTargets();
+    if(result == null || !result.hasTargets()) {
+      try{
+        System.out.println(!result.hasTargets() ? "\nCamera could not see any targets" : "");
+      } catch(Exception e) { //Can't access result if it's null, so it throws an error.
+        System.out.println("\nCamera does not have a result. Likely updated too many times");
+      } 
+      return false;
+    } else return true;
   }
 
   /** Takes a screenshot can be found at the bottom of the settings menu (10.91.49.11) */

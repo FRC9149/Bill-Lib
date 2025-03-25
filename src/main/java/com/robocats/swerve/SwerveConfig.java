@@ -15,7 +15,8 @@ public record SwerveConfig(
     double DrivePeriod,
     SwerveDriveKinematics drive_kinematics,
     ModuleConfig module_config,
-    Gyro gyroscope
+    Gyro gyroscope,
+    boolean isFieldSymmetric
 ) {
     public static SwerveConfig generic(ModuleConfig modConfig) {
         return new SwerveConfig(4, 3*Math.PI, .1016, TimedRobot.kDefaultPeriod,
@@ -25,7 +26,8 @@ public record SwerveConfig(
                 new Translation2d(-0.629 / 2, 0.629 / 2),
                 new Translation2d(0.629 / 2, 0.629 / 2)), 
             modConfig,
-            new ahrsGyro(NavXComType.kMXP_SPI, Math.PI/2, false)
+            new ahrsGyro(NavXComType.kMXP_SPI, Math.PI/2, false),
+            false
         );
     }
 }

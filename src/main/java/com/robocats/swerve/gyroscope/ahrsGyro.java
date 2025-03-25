@@ -16,8 +16,8 @@ public class ahrsGyro implements Gyro {
         this.reversed = reversed;
     }
 
-    public double getRadians() { return gyro.getRotation2d().getRadians() + offset; }
+    public double getRadians() { return (gyro.getRotation2d().getRadians() + offset); }
     public double getRate() { return gyro.getRate() * (reversed ? -1.0 : 1.0); }
-    public Rotation2d getRotation2d() { return gyro.getRotation2d(); }
-    public void zero() { gyro.resetDisplacement(); }
+    public Rotation2d getRotation2d() { return Rotation2d.fromRadians(getRadians()); }
+    public void zero() { gyro.resetDisplacement(); gyro.reset(); gyro.zeroYaw();}
 }

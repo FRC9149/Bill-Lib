@@ -76,6 +76,7 @@ public class SwerveModule {
           // ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
           // ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared)
   );
+  private final PIDController test;
   
     /**
      * Constructs a SwerveModule.
@@ -94,7 +95,9 @@ public class SwerveModule {
         double encoderOffset,
         double wheelDiameterMeters,
         double maxSpeedMetersPerSecond,
-        boolean motorReversed) {
+        boolean motorReversed,
+        PIDController test) {
+          this.test = test;
       this.name = name;
       this.maxSpeedMetersPerSecond = maxSpeedMetersPerSecond;
     this.WheelDiameterMeters = wheelDiameterMeters;
@@ -114,6 +117,7 @@ public class SwerveModule {
 
     // Limit the PID Controller's input range between -pi and pi and set the input
     // to be continuous.
+    test.enableContinuousInput(0, 2*Math.PI);
     m_turningPIDController.enableContinuousInput(0, 2*Math.PI);
   }
 

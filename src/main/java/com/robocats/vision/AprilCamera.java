@@ -23,14 +23,25 @@ public class AprilCamera extends Camera {
    * @return The directional speed that you should turn to get to the target
    */
   public double alignWithTag(int id, PIDController pid) {
-    super.update();
     double yaw = super.getYaw();
-    // System.out.println(yaw);
 
     if (pid == null) {
       pid = new PIDController(0.039, 0.059, 0);
     }
-    return -pid.calculate(yaw, 0);
+    return pid.calculate(yaw, 0)/1.5;
+  }
+
+  public double squareWithTag(int id, PIDController pid, double robotRotationRadians) {
+    double zAngle = isResultUsable() ? 
+    getTargetPose(getAprilTagId()).getRotation().getZ() : 0;
+
+    if (pid == null) {
+      pid = new PIDController(0.3, 0, 0);
+    }
+    return pid.calculate(robotRotationRadians, zAngle);
+  }
+  public double getZAngleRadians() {
+    return isResultUsable() ? result.getBestTarget().getBestCameraToTarget().getRotation().getAngle() : 0;
   }
 
   public double tagHeight(int id) {
@@ -44,18 +55,27 @@ public class AprilCamera extends Camera {
   }
 
   public Pose3d getRobotPose() {
-    super.update();
+    if (!isResultUsable()) return null;
     var result = estimator.update(super.result);
     return result.isPresent() ? result.get().estimatedPose : null;
   }
   public Pose3d getTargetPose(int id) {
-    return tagLayout.getTagPose(id).get();
+    return tagLayout.getTagPose(id).orElse(null);
   }
 
-  public double getDistance() {
-    Pose3d robotPose = getRobotPose();
-    if (robotPose == null || !isResultUsable()) { return -1; }
-    return PhotonUtils.getDistanceToPose(robotPose.toPose2d(), getTargetPose(getAprilTagId()).toPose2d());
+  /**Distance Left and right (Left positive)*/
+  public double getDistanceY() {
+    return isResultUsable() ? super.result.getBestTarget().getBestCameraToTarget().getY() : -1;
+    // Pose3d robotPose = getRobotPose();
+    // if (robotPose == null || !isResultUsable()) { return -1; }
+    // return PhotonUtils.getDistanceToPose(robotPose.toPose2d(), getTargetPose(getAprilTagId()).toPose2d());
+  }
+  /**
+   * Distance Forward and Back (Backwards positive)
+   * @return
+   */
+  public double getDistanceX() {
+    return isResultUsable() ? super.result.getBestTarget().getBestCameraToTarget().getX() : -1;
   }
 
   /**

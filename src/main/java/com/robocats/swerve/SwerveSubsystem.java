@@ -2,7 +2,10 @@ package com.robocats.swerve;
 
 import static edu.wpi.first.units.Units.Meter;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -12,6 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -28,14 +32,16 @@ public class SwerveSubsystem extends SubsystemBase {
 
     // Odometry class for tracking robot pose
     SwerveDriveOdometry m_odometry;
+    // PIDController test;
     
 
     /** Creates a 
      * @param config
      */
-    public SwerveSubsystem(SwerveConfig config) {
+    public SwerveSubsystem(SwerveConfig config, PIDController test) {
+        // this.test = test;
         swerveConfig = config;
-        initalizeSwerveModules();
+        initalizeSwerveModules(test);
         m_turnController.enableContinuousInput(0, 2 * Math.PI);
 
         try {
@@ -45,7 +51,7 @@ public class SwerveSubsystem extends SubsystemBase {
         }
     }
 
-    private void initalizeSwerveModules() {
+    private void initalizeSwerveModules(PIDController test) {
         m_frontLeft = new SwerveModule(
         "fl",
             swerveConfig.module_config().frontLeftDrivePort(),
@@ -55,6 +61,7 @@ public class SwerveSubsystem extends SubsystemBase {
             swerveConfig.wheelDiameterMeters(),
             swerveConfig.maxAngularVelocityRadiansPerSecond(),
             swerveConfig.module_config().frontLeftEncoderReversed()
+            ,test
         );
 
         m_backLeft = new SwerveModule(
@@ -66,6 +73,7 @@ public class SwerveSubsystem extends SubsystemBase {
             swerveConfig.wheelDiameterMeters(),
             swerveConfig.maxAngularVelocityRadiansPerSecond(),
             swerveConfig.module_config().backLeftEncoderReversed()
+            ,test
         );
 
         m_frontRight = new SwerveModule(
@@ -77,6 +85,7 @@ public class SwerveSubsystem extends SubsystemBase {
             swerveConfig.wheelDiameterMeters(),
             swerveConfig.maxAngularVelocityRadiansPerSecond(),
             swerveConfig.module_config().frontRightEncoderReversed()
+            ,test
         );
 
         m_backRight = new SwerveModule(
@@ -88,6 +97,7 @@ public class SwerveSubsystem extends SubsystemBase {
             swerveConfig.wheelDiameterMeters(),
             swerveConfig.maxAngularVelocityRadiansPerSecond(),
             swerveConfig.module_config().backRightEncoderReversed()
+            ,test
         );
 
         m_odometry = new SwerveDriveOdometry(
@@ -195,10 +205,17 @@ His name is Jeremy...
      *                      the field.
      */
     public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+        double magnitude = Math.sqrt(xSpeed*xSpeed + ySpeed*ySpeed);
+        if (Math.abs(xSpeed) > 1 || Math.abs(ySpeed) > 1) {
+            xSpeed /= magnitude;
+            ySpeed /= magnitude;
+        }
+        rot = Math.min(rot, 1);
+        rot = Math.max(rot, -1);
+
+        // apply the max speeds
         xSpeed *= swerveConfig.maxSpeedMetersPerSecond();
         ySpeed *= swerveConfig.maxSpeedMetersPerSecond();
-        rot = rot > 1 ? 1 : rot;
-        rot = rot < -1 ? -1 : rot;
         rot *= swerveConfig.maxAngularVelocityRadiansPerSecond();
         
         double[] transformedX, transformedY, finalTransformed;
@@ -231,6 +248,10 @@ His name is Jeremy...
                 m_turnController.calculate(getHeading(), headingAngle),
             true
         );
+    }
+
+    public void drive(ChassisSpeeds speeds, boolean fieldRelative) {
+        drive(speeds.vyMetersPerSecond, speeds.vxMetersPerSecond, speeds.omegaRadiansPerSecond, fieldRelative);
     }
 
     public void driveTo(Pose2d pose) {
@@ -297,30 +318,30 @@ His name is Jeremy...
     /**
    * Setup AutoBuilder for PathPlanner.
    */
-//   public void setupPathPlanner() {
-    // AutoBuilder.configure(
-            // this::getPose, // Robot pose supplier
-            // this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
-            // this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-            // (speeds, feedforwards) -> drive(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
-            // new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                    // new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-                    // new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-            // ),
-            // config, // The robot configuration
-            // () -> {
+  public void setupPathPlanner() {
+    AutoBuilder.configure(
+            this::getPose, // Robot pose supplier
+            this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
+            this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            (speeds, feedforwards) -> drive(speeds, false), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+            new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+            ),
+            config, // The robot configuration
+            () -> {
             //   Boolean supplier that controls when the path will be mirrored for the red alliance
             //   This will flip the path being followed to the red side of the field.
             //   THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-// 
-            //   var alliance = DriverStation.getAlliance();
-            //   if (alliance.isPresent()) {
-                // return alliance.get() == DriverStation.Alliance.Red;
-            //   }
-            //   return false;
-            // },
-            // this // Reference to this subsystem to set requirements
-    // );
-//   }
 
+              var alliance = DriverStation.getAlliance();
+              if (alliance.isPresent() && !swerveConfig.isFieldSymmetric()) {
+                return alliance.get() == DriverStation.Alliance.Red;
+              }
+              return false;
+            },
+            this // Reference to this subsystem to set requirements
+    );
+    swerveConfig.gyroscope().zero(); // zero so that the robot is facing forward and not sideways
+  }
 }
