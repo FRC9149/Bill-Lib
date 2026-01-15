@@ -4,8 +4,13 @@ This library sparked to life as our first 3 years had rough code swerve code tha
 
 ### Installation
 
-`implementation fileTree(dir: 'lib', include: '*.jar')`
+##### Step one
+Install a release jar and move the file to the lib directory inside your workspace. (directory is not created automatically)
+
+##### Step two
 Add this line to dependencies in build.gradle
+`implementation fileTree(dir: 'lib', include: '*.jar')`
+
 
 ```
 dependencies { 
