@@ -21,93 +21,94 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveSubsystem extends SubsystemBase {
     // Robot swerve modules
-    private final PIDController m_turnController = new PIDController(0.5, 0.0, 0.0);
+    private final PIDController turnController = new PIDController(0.5, 0.0, 0.0);
     private RobotConfig config;
     public final SwerveConfig swerveConfig;
 
-    private SwerveModule m_frontLeft;
-    private SwerveModule m_backLeft;
-    private SwerveModule m_frontRight;
-    private SwerveModule m_backRight;
+    private SwerveModule frontLeft;
+    private SwerveModule backLeft;
+    private SwerveModule frontRight;
+    private SwerveModule backRight;
 
     // Odometry class for tracking robot pose
-    SwerveDriveOdometry m_odometry;
-    // PIDController test;
+    SwerveDriveOdometry odometry;
     
 
     /** Creates a 
-     * @param config
+     * @param config the SwerveConfig record that holds information such as dimensions, max speed, and gyroscope
      */
-    public SwerveSubsystem(SwerveConfig config, PIDController test) {
-        // this.test = test;
+    public SwerveSubsystem(SwerveConfig config, PIDController pidController) {
         swerveConfig = config;
-        initalizeSwerveModules(test);
-        m_turnController.enableContinuousInput(0, 2 * Math.PI);
+        initalizeSwerveModules(pidController);
+        turnController.enableContinuousInput(0, 2 * Math.PI);
 
         try {
+            //ngl, no idea what this does
+            //AI says it loads a config from something like smartdashboard or another interface 
+            //This sounds right, but we don't have anything like that. so...
           this.config = RobotConfig.fromGUISettings();
         } catch (Exception e) {
           e.printStackTrace();
         }
     }
 
-    private void initalizeSwerveModules(PIDController test) {
-        m_frontLeft = new SwerveModule(
+    private void initalizeSwerveModules(PIDController pidController) {
+        frontLeft = new SwerveModule(
         "fl",
-            swerveConfig.module_config().frontLeftDrivePort(),
-            swerveConfig.module_config().frontLeftTurningPort(),
-            swerveConfig.module_config().frontLeftEncoderPort(),
-            swerveConfig.module_config().frontLeftEncoderOffset(),
+            swerveConfig.moduleConfig().frontLeftDrivePort(),
+            swerveConfig.moduleConfig().frontLeftTurningPort(),
+            swerveConfig.moduleConfig().frontLeftEncoderPort(),
+            swerveConfig.moduleConfig().frontLeftEncoderOffset(),
             swerveConfig.wheelDiameterMeters(),
             swerveConfig.maxAngularVelocityRadiansPerSecond(),
-            swerveConfig.module_config().frontLeftEncoderReversed()
-            ,test
+            swerveConfig.moduleConfig().frontLeftEncoderReversed(),
+            pidController
         );
 
-        m_backLeft = new SwerveModule(
+        backLeft = new SwerveModule(
         "bl",
-            swerveConfig.module_config().backLeftDrivePort(),
-            swerveConfig.module_config().backLeftTurningPort(),
-            swerveConfig.module_config().backLeftEncoderPort(),
-            swerveConfig.module_config().backLeftEncoderOffset(),
+            swerveConfig.moduleConfig().backLeftDrivePort(),
+            swerveConfig.moduleConfig().backLeftTurningPort(),
+            swerveConfig.moduleConfig().backLeftEncoderPort(),
+            swerveConfig.moduleConfig().backLeftEncoderOffset(),
             swerveConfig.wheelDiameterMeters(),
             swerveConfig.maxAngularVelocityRadiansPerSecond(),
-            swerveConfig.module_config().backLeftEncoderReversed()
-            ,test
+            swerveConfig.moduleConfig().backLeftEncoderReversed(),
+            pidController
         );
 
-        m_frontRight = new SwerveModule(
+        frontRight = new SwerveModule(
         "fr",
-            swerveConfig.module_config().frontRightDrivePort(),
-            swerveConfig.module_config().frontRightTurningPort(),
-            swerveConfig.module_config().frontRightEncoderPort(),
-            swerveConfig.module_config().frontRightEncoderOffset(),
+            swerveConfig.moduleConfig().frontRightDrivePort(),
+            swerveConfig.moduleConfig().frontRightTurningPort(),
+            swerveConfig.moduleConfig().frontRightEncoderPort(),
+            swerveConfig.moduleConfig().frontRightEncoderOffset(),
             swerveConfig.wheelDiameterMeters(),
             swerveConfig.maxAngularVelocityRadiansPerSecond(),
-            swerveConfig.module_config().frontRightEncoderReversed()
-            ,test
+            swerveConfig.moduleConfig().frontRightEncoderReversed(),
+            pidController
         );
 
-        m_backRight = new SwerveModule(
+        backRight = new SwerveModule(
         "br",
-            swerveConfig.module_config().backRightDrivePort(),
-            swerveConfig.module_config().backRightTurningPort(),
-            swerveConfig.module_config().backRightEncoderPort(),
-            swerveConfig.module_config().backRightEncoderOffset(),
+            swerveConfig.moduleConfig().backRightDrivePort(),
+            swerveConfig.moduleConfig().backRightTurningPort(),
+            swerveConfig.moduleConfig().backRightEncoderPort(),
+            swerveConfig.moduleConfig().backRightEncoderOffset(),
             swerveConfig.wheelDiameterMeters(),
             swerveConfig.maxAngularVelocityRadiansPerSecond(),
-            swerveConfig.module_config().backRightEncoderReversed()
-            ,test
+            swerveConfig.moduleConfig().backRightEncoderReversed(),
+            pidController
         );
 
-        m_odometry = new SwerveDriveOdometry(
-            swerveConfig.drive_kinematics(),
+        odometry = new SwerveDriveOdometry(
+            swerveConfig.driveKinematics(),
             Rotation2d.fromRadians(0),
             new SwerveModulePosition[] {
-                    m_frontLeft.getPosition(),
-                    m_frontRight.getPosition(),
-                    m_backLeft.getPosition(),
-                    m_backRight.getPosition()
+                    frontLeft.getPosition(),
+                    frontRight.getPosition(),
+                    backLeft.getPosition(),
+                    backRight.getPosition()
                 });
     }
 /*  Don't ask...
@@ -143,36 +144,35 @@ His name is Jeremy...
     public void periodic() {
         // Update the odometry in the periodic block
         SmartDashboard.putNumber("gyro", getHeading());
-        m_frontLeft.periodic();
-        m_frontRight.periodic();
-        m_backLeft.periodic();
-        m_backRight.periodic();
+        frontLeft.periodic();
+        frontRight.periodic();
+        backLeft.periodic();
+        backRight.periodic();
         
-        m_odometry.update(
+        odometry.update(
                 getRotation(),
                 new SwerveModulePosition[] {
-                        m_frontLeft.getPosition(),
-                        m_frontRight.getPosition(),
-                        m_backLeft.getPosition(),
-                        m_backRight.getPosition()
+                        frontLeft.getPosition(),
+                        frontRight.getPosition(),
+                        backLeft.getPosition(),
+                        backRight.getPosition()
                 });
     }
 
-    /**
-     * Returns the currently-estimated pose of the robot.
+    /** 
      *
-     * @return The pose.
+     * @return the currently-estimated pose of the robot.
      */
     public Pose2d getPose() {
-        return m_odometry.getPoseMeters();
+        return odometry.getPoseMeters();
     }
 
     public ChassisSpeeds getChassisSpeeds() {
-        return swerveConfig.drive_kinematics().toChassisSpeeds(new SwerveModuleState[] {
-            m_frontLeft.getState(),
-            m_frontRight.getState(),
-            m_backLeft.getState(),
-            m_backRight.getState()
+        return swerveConfig.driveKinematics().toChassisSpeeds(new SwerveModuleState[] {
+            frontLeft.getState(),
+            frontRight.getState(),
+            backLeft.getState(),
+            backRight.getState()
         });
     }
 
@@ -182,13 +182,13 @@ His name is Jeremy...
      * @param pose The pose to which to set the odometry.
      */
     public void resetOdometry(Pose2d pose) {
-        m_odometry.resetPosition(
+        odometry.resetPosition(
                 getRotation(),
                 new SwerveModulePosition[] {
-                        m_frontLeft.getPosition(),
-                        m_frontRight.getPosition(),
-                        m_backLeft.getPosition(),
-                        m_backRight.getPosition()
+                        frontLeft.getPosition(),
+                        frontRight.getPosition(),
+                        backLeft.getPosition(),
+                        backRight.getPosition()
                 },
                 pose);
     }
@@ -228,7 +228,7 @@ His name is Jeremy...
             finalTransformed = new double[]{xSpeed, ySpeed};
         }
 
-        var swerveModuleStates = swerveConfig.drive_kinematics().toSwerveModuleStates(
+        var swerveModuleStates = swerveConfig.driveKinematics().toSwerveModuleStates(
             ChassisSpeeds.discretize(
                 new ChassisSpeeds(finalTransformed[0], finalTransformed[1], rot),
                 swerveConfig.DrivePeriod()
@@ -245,7 +245,7 @@ His name is Jeremy...
             xSpeed,
             ySpeed,
             xHeading == 0 && yHeading == 0 ? 0 : // so that when you stop pressing the right stick it'll stop spinning
-                m_turnController.calculate(getHeading(), headingAngle),
+                turnController.calculate(getHeading(), headingAngle),
             true
         );
     }
@@ -254,6 +254,9 @@ His name is Jeremy...
         drive(speeds.vyMetersPerSecond, speeds.vxMetersPerSecond, speeds.omegaRadiansPerSecond, fieldRelative);
     }
 
+    /**
+     * @deprecated I believe this doens't work atm
+     */
     public void driveTo(Pose2d pose) {
         Pose2d currentPose = getPose();
         // System.out.println(currentPose.getX());
@@ -276,20 +279,20 @@ His name is Jeremy...
         SwerveDriveKinematics.desaturateWheelSpeeds(
             desiredStates, swerveConfig.maxSpeedMetersPerSecond());
 
-        m_frontLeft.setDesiredState(desiredStates[0]);
-        m_frontRight.setDesiredState(desiredStates[1]);
-        m_backLeft.setDesiredState(desiredStates[2]);
-        m_backRight.setDesiredState(desiredStates[3]);
+        frontLeft.setDesiredState(desiredStates[0]);
+        frontRight.setDesiredState(desiredStates[1]);
+        backLeft.setDesiredState(desiredStates[2]);
+        backRight.setDesiredState(desiredStates[3]);
     }
 
     /**
      * Resets the drive encoders to currently read a position of 0.
      */
     public void resetEncoders() {
-        m_frontLeft.resetEncoders();
-        m_backLeft.resetEncoders();
-        m_frontRight.resetEncoders();
-        m_backRight.resetEncoders();
+        frontLeft.resetEncoders();
+        backLeft.resetEncoders();
+        frontRight.resetEncoders();
+        backRight.resetEncoders();
     }
 
     public Rotation2d getRotation() {

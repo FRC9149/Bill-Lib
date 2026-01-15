@@ -17,18 +17,18 @@ import com.ctre.phoenix6.hardware.CANcoder;
 
 public class SwerveModule {
   private final String name;
-  private final SparkMax m_driveMotor;
-  private final SparkMax m_turningMotor;
+  private final SparkMax driveMotor;
+  private final SparkMax turningMotor;
   private final SparkMaxConfig config = new SparkMaxConfig();
   
-  private final RelativeEncoder m_driveEncoder;
+  private final RelativeEncoder driveEncoder;
 
-  private final CANcoder m_absolute_encoder;
+  private final CANcoder absoluteEncoder;
 
-  private final double m_absoluteOffset;
-  private final boolean m_motorReversed;
+  private final double absoluteOffset;
+  private final boolean motorReversed;
   private final double maxSpeedMetersPerSecond;
-  private final double WheelDiameterMeters;
+  private final double wheelDiameterMeters;
 
   public void periodic() {
     SmartDashboard.putNumber(name + " turn encoder", getTurnDistance());
@@ -38,9 +38,9 @@ public class SwerveModule {
    * @return The distance that the module has driven since reset (meters)
    */
   private double getDriveDistance() {
-    // if(m_driveMotor.getDeviceId() == 2) System.out.println(m_driveEncoder.getPosition());
+    // if(driveMotor.getDeviceId() == 2) System.out.println(driveEncoder.getPosition());
 
-    return m_driveEncoder.getPosition() * (Math.PI * Math.pow(WheelDiameterMeters/2, 2)) ;
+    return driveEncoder.getPosition() * (Math.PI * Math.pow(wheelDiameterMeters/2, 2)) ;
     // multiple the rotation amount by the circumfrence to get the distance traveled [PI(r^2)]
   }
 
@@ -48,16 +48,16 @@ public class SwerveModule {
    * @return The current angle of the module (radians)
    */
   private double getTurnDistance() {
-    double rotationRad = (m_absolute_encoder.getAbsolutePosition().getValueAsDouble() - m_absoluteOffset) * 2 * Math.PI;
+    double rotationRad = (absoluteEncoder.getAbsolutePosition().getValueAsDouble() - absoluteOffset) * 2 * Math.PI;
     // rotationRad = rotationRad > Math.PI ? rotationRad - 2 * Math.PI : rotationRad;
     // rotationRad = rotationRad < -Math.PI ? rotationRad + 2 * Math.PI : rotationRad; // bounds the angle to -PI-PI instead of 0-2PI
 
     return rotationRad;
-    // if(m_absolute_encoder.getDeviceID() == 15) System.out.println(m_absolute_encoder.getAbsolutePosition().getValueAsDouble());
+    // if(absoluteEncoder.getDeviceID() == 15) System.out.println(absoluteEncoder.getAbsolutePosition().getValueAsDouble());
 /*
-    double encoderValue = m_absolute_encoder.getAbsolutePosition().getValueAsDouble() + ((m_absoluteReversed ? -1 : 1) * m_absoluteOffset);
+    double encoderValue = absoluteEncoder.getAbsolutePosition().getValueAsDouble() + ((m_absoluteReversed ? -1 : 1) * absoluteOffset);
 
-    encoderValue += m_motorReversed ? .5 : 0;
+    encoderValue += motorReversed ? .5 : 0;
     while (encoderValue < 0) encoderValue += 1;
     while (encoderValue > 1) encoderValue -= 1; // 1 = 360 degrees so we're finding a coterminal angle that that is between 0 and 1 rotations
     //probably could skip this step but it's not a big deal
@@ -65,10 +65,10 @@ public class SwerveModule {
     return encoderValue * 2 * Math.PI; //convert to radians*/
   }
 
-  private final PIDController m_drivePIDController = new PIDController(0.002, 1.5, 2.0);
+  private final PIDController drivePIDController = new PIDController(0.002, 1.5, 2.0);
 
   // Using a TrapezoidProfile PIDController to allow for smooth turning
-  private final PIDController m_turningPIDController = new PIDController(
+  private final PIDController turningPIDController = new PIDController(
       .743,
       .385,
       .015
@@ -76,6 +76,7 @@ public class SwerveModule {
           // ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
           // ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared)
   );
+  //TODO figure out what I was testing
   private final PIDController test;
   
     /**
@@ -97,28 +98,30 @@ public class SwerveModule {
         double maxSpeedMetersPerSecond,
         boolean motorReversed,
         PIDController test) {
+          // This formatting 🤮
+          // I am getting a headache just looking at it
           this.test = test;
       this.name = name;
       this.maxSpeedMetersPerSecond = maxSpeedMetersPerSecond;
-    this.WheelDiameterMeters = wheelDiameterMeters;
-    m_driveMotor = new SparkMax(driveMotorChannel, MotorType.kBrushless);
-    m_turningMotor = new SparkMax(turningMotorChannel, MotorType.kBrushless);
+    this.wheelDiameterMeters = wheelDiameterMeters;
+    driveMotor = new SparkMax(driveMotorChannel, MotorType.kBrushless);
+    turningMotor = new SparkMax(turningMotorChannel, MotorType.kBrushless);
 
-    m_driveEncoder = m_driveMotor.getEncoder();
+    driveEncoder = driveMotor.getEncoder();
 
-    m_absolute_encoder = new CANcoder(encoderChannel);
+    absoluteEncoder = new CANcoder(encoderChannel);
 
-    m_absoluteOffset = encoderOffset;
-    m_motorReversed = motorReversed;
+    absoluteOffset = encoderOffset;
+    motorReversed = motorReversed;
     config.idleMode(IdleMode.kBrake);
 
-    m_driveMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-    m_turningMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    driveMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    turningMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
     // Limit the PID Controller's input range between -pi and pi and set the input
     // to be continuous.
     test.enableContinuousInput(0, 2*Math.PI);
-    m_turningPIDController.enableContinuousInput(0, 2*Math.PI);
+    turningPIDController.enableContinuousInput(0, 2*Math.PI);
   }
 
   /**
@@ -128,12 +131,12 @@ public class SwerveModule {
    */
   public SwerveModuleState getState() {
     return new SwerveModuleState(
-        (m_motorReversed ? -1 : 1) * m_driveEncoder.getVelocity(),
+        (motorReversed ? -1 : 1) * driveEncoder.getVelocity(),
         new Rotation2d(getTurnDistance()));
     // original
 
     // return new SwerveModuleState(
-    // m_driveEncoder.getRate(), new Rotation2d(m_turningEncoder.getDistance()));
+    // driveEncoder.getRate(), new Rotation2d(m_turningEncoder.getDistance()));
   }
 
   /**
@@ -148,7 +151,7 @@ public class SwerveModule {
     // original
 
     // return new SwerveModulePosition(
-    // m_driveEncoder.getDistance(), new
+    // driveEncoder.getDistance(), new
     // Rotation2d(m_turningEncoder.getDistance()));
   }
 
@@ -170,25 +173,25 @@ public class SwerveModule {
     // driving.
     desiredState.cosineScale(encoderRotation);
 
-    // double velocity = m_driveEncoder.getVelocity() 
+    // double velocity = driveEncoder.getVelocity() 
                     //   * 60 
-                    //   * 2 * Math.PI * Math.pow(WheelDiameterMeters/2, 2);
+                    //   * 2 * Math.PI * Math.pow(wheelDiameterMeters/2, 2);
     //Convert rpm to m/s
     // * 60 to get into seconds
     // * 2PI(r^2) for meters
 
     // Calculate the turning motor output from the turning PID controller.
-    final double turnOutput = m_turningPIDController.calculate(getTurnDistance(), desiredState.angle.getRadians());
-    // m_turningPIDController.calculate(m_turningEncoder.getDistance(),
+    final double turnOutput = turningPIDController.calculate(getTurnDistance(), desiredState.angle.getRadians());
+    // turningPIDController.calculate(m_turningEncoder.getDistance(),
     // desiredState.angle.getRadians());
 
     // Calculate the turning motor output from the turning PID controller.
-    m_driveMotor.set(desiredState.speedMetersPerSecond / maxSpeedMetersPerSecond);
-    m_turningMotor.set(turnOutput);
+    driveMotor.set(desiredState.speedMetersPerSecond / maxSpeedMetersPerSecond);
+    turningMotor.set(turnOutput);
   }
 
   /** Zeroes all the SwerveModule encoders. */
   public void resetEncoders() {
-    m_driveEncoder.setPosition(0);
+    driveEncoder.setPosition(0);
   }
 }

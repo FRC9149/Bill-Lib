@@ -12,9 +12,9 @@ public record SwerveConfig(
     double maxSpeedMetersPerSecond,
     double maxAngularVelocityRadiansPerSecond,
     double wheelDiameterMeters,
-    double DrivePeriod,
-    SwerveDriveKinematics drive_kinematics,
-    ModuleConfig module_config,
+    double drivePeriod,
+    SwerveDriveKinematics driveKinematics,
+    ModuleConfig moduleConfig,
     Gyro gyroscope,
     boolean isFieldSymmetric
 ) {
