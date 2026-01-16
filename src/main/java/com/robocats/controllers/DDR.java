@@ -32,15 +32,15 @@ public class DDR {
     public boolean getCenter() { return gamepad.getRawAxis(4) > 0.5; } // the center circle is an axis for some reason
 
     //these functions return triggers that activate when the given button is pressed
-    public Trigger onUp() { return new Trigger(() -> raw_getUp()); }
-    public Trigger onRight() { return new Trigger(() -> raw_getRight()); }
-    public Trigger onDown() { return new Trigger(() -> raw_getDown()); }
-    public Trigger onLeft() { return new Trigger(() -> raw_getLeft()); }
-    public Trigger onX() { return new Trigger(() -> raw_getX()); }
-    public Trigger onO() { return new Trigger(() -> raw_getO()); }
-    public Trigger onTri() { return new Trigger(() -> raw_getTri()); }
-    public Trigger onSqr() { return new Trigger(() -> raw_getSqr()); }
-    public Trigger onSelect() { return new Trigger(() -> raw_getSelect()); }
-    public Trigger onStart() { return new Trigger(() -> raw_getStart()); }
-    public Trigger onCenter() { return new Trigger(() -> raw_getCenter()); }
+    public Trigger onUp() { return new Trigger(() -> getUp()); }
+    public Trigger onRight() { return new Trigger(() -> getRight()); }
+    public Trigger onDown() { return new Trigger(() -> getDown()); }
+    public Trigger onLeft() { return new Trigger(() -> getLeft()); }
+    public Trigger onX() { return new Trigger(() -> getX()); }
+    public Trigger onO() { return new Trigger(() -> getO()); }
+    public Trigger onTri() { return new Trigger(() -> getTriangle()); }
+    public Trigger onSqr() { return new Trigger(() -> getSquare()); }
+    public Trigger onSelect() { return new Trigger(() -> getSelect()); }
+    public Trigger onStart() { return new Trigger(() -> getStart()); }
+    public Trigger onCenter() { return new Trigger(() -> getCenter()); }
 }

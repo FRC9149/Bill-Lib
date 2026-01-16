@@ -101,7 +101,7 @@ public class SwerveModule {
         absoluteEncoder = new CANcoder(encoderPort);
 
         absoluteOffset = encoderOffset;
-        motorReversed = motorReversed;
+        this.motorReversed = motorReversed;
         config.idleMode(IdleMode.kBrake);
 
         driveMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);

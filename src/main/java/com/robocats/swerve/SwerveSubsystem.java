@@ -3,8 +3,8 @@ package com.robocats.swerve;
 import static edu.wpi.first.units.Units.Meter;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.robotConfig.PIDConstants;
-import com.pathplanner.lib.robotConfig.RobotConfig;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -43,9 +43,7 @@ public class SwerveSubsystem extends SubsystemBase {
         turnController.enableContinuousInput(0, 2 * Math.PI);
 
         try {
-            //ngl, no idea what this does
-            //AI says it loads a robotConfig from something like smartdashboard or another interface 
-            //This sounds right, but we don't have anything like that. so...
+            //I believe this gets the settings from the path planner application
           this.robotConfig = RobotConfig.fromGUISettings();
         } catch (Exception e) {
           e.printStackTrace();
@@ -227,7 +225,7 @@ His name is Jeremy...
         var swerveModuleStates = swerveConfig.driveKinematics().toSwerveModuleStates(
             ChassisSpeeds.discretize(
                 new ChassisSpeeds(finalTransformed[0], finalTransformed[1], rot),
-                swerveConfig.DrivePeriod()
+                swerveConfig.drivePeriod()
             )
         );
 

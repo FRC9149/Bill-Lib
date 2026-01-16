@@ -41,11 +41,9 @@ public class Streetfightercontrol {
     public Trigger onRightBumper() {
         return new Trigger(()-> joystick.getRawButton(8));
     }
-    @Override
     public Trigger onBack() {
         return onRightBumper();
     }
-    @Override
     public Trigger onStart() {
         return onLeftBumper();
     }
@@ -56,19 +54,15 @@ public class Streetfightercontrol {
     /**@return A triiger that is run when the bottom right button is pressed */
     public Trigger onRightStickIn() {
         return new Trigger(()-> joystick.getRawButton(2));}
-    @Override
     public Trigger onLeftTrigger(double threshold) {
         return onLeftBumper();
     }
-    @Override
     public Trigger onRightTrigger(double threshold) {
         return onRightBumper();
     }
-    @Override
     public double getLeftTrigger() {
         return onLeftBumper().getAsBoolean() ? 1 : 0;
     }
-    @Override
     public double getRightTrigger() {
         return onRightBumper().getAsBoolean() ? 1 : 0;
     }
@@ -78,55 +72,42 @@ public class Streetfightercontrol {
     public double getLeftX() {
         return onX().getAsBoolean() ? 1 : 0;
     }
-    @Override
     public double getLeftY() {
         return onY().getAsBoolean() ? 1 : 0;
     }
-    @Override
     public double getRightX() {
         return onA().getAsBoolean() ? 1 : 0;
     }
-    @Override
     public double getRightY() {
         return onB().getAsBoolean() ? 1 : 0;
     }
-    @Override
     public Trigger onDPadUp() {
         return new Trigger(()-> false);
     }
-    @Override
     public Trigger onDPadUpRight() {
         return new Trigger(()-> false);
     }
-    @Override
     public Trigger onDPadRight() {
         return new Trigger(()-> false);
     }
-    @Override
     public Trigger onDPadDownRight() {
         return new Trigger(()-> false);
     }
-    @Override
     public Trigger onDPadDown() {
         return new Trigger(()-> false);
     }
-    @Override
     public Trigger onDPadDownLeft() {
         return new Trigger(()-> false);
     }
-    @Override
     public Trigger onDPadLeft() {
         return new Trigger(()-> false);
     }
-    @Override
     public Trigger onDPadUpLeft() {
         return new Trigger(()-> false);
     }
-    @Override
     public Trigger onDPadNull() {
         return new Trigger(()-> false);
     }
-    @Override
     public int getDpadAngle() {
         return -1;
     }
