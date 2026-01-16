@@ -1,5 +1,16 @@
 package com.robocats.swerve;
 
+/**
+ * Record of which port the modules are connected to, their offset, and if they're reversed.
+ * <p>Record of:</p>
+ * <ul>
+ *      <li>Drive motor CAN ports</li>
+ *      <li>Turning motor CAN ports</li>
+ *      <li>Absolute encoder ports</li>
+ *      <li>Absolute encoder offsets as described in pheonix</li>
+ *      <li>Whether the Absolute encoders are reversed</li>
+ * </ul>
+ */
 public record ModuleConfig(
     int frontLeftDrivePort,
     int backLeftDrivePort,

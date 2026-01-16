@@ -4,19 +4,19 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class distanceSensor extends SubsystemBase {
+public class DistanceSensor extends SubsystemBase {
   private AnalogInput sensor;
   private double tripVal = 4;
-
+  //TODO figure out and write what units the distance sensor uses
   /**
    * @param port The port that the sensor is connected to
    */
-  public distanceSensor(int port) { sensor = new AnalogInput(port); }
+  public DistanceSensor(int port) { sensor = new AnalogInput(port); }
   /**
    * @param port The port that the sensor is connected to 
    * @param tripValue The function isTripped() will return true if the distance is past this value
    */
-  public distanceSensor(int port, double tripValue) {
+  public DistanceSensor(int port, double tripValue) {
     sensor = new AnalogInput(port);
     tripVal = tripValue;
   }

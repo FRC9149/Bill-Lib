@@ -2,14 +2,14 @@ package com.robocats.sensors;
 
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
-public class throughTheBoreEncoder {
+public class ThroughBoreEncoder {
     private final DutyCycleEncoder encoder;
 
-    /** Creates a new relative throughTheBoreEncoder class
+    /** 
      * @param port the port that the encoder is plugged in to
      * @param inverted inverts the direction of the encoder if true
      */
-    public throughTheBoreEncoder(int port, boolean inverted) {
+    public ThroughBoreEncoder(int port, boolean inverted) {
         encoder = new DutyCycleEncoder(port);
         encoder.setInverted(inverted);
         encoder.setDutyCycleRange(1, 1024);

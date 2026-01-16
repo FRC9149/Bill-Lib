@@ -3,13 +3,13 @@ package com.robocats.controllers;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+//TODO: change the function names to match the controller
+
 /**
  * A class for a wired ps3 controller
- * @author El Campus - grad 2026
- * @author 404.el.404@gmail.com
- * @since 2025-02-11
+ * @author El Campus
  */
-public class Ps3 implements Controller {
+public class Ps3 {
     private XboxController cont;
 
     public Ps3(int port) {

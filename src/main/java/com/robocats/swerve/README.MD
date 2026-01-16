@@ -17,4 +17,5 @@ When writing the code, please try to keep things modular, as this means it's eas
 
 - Create documentation. While writing this I was very confused. I became less confused but didn't write anything down, so looking back on it makes me even more confused.
 
-- I am in the middle of formatting it all to camel case. Please try to follow that same style.
+- When I create projects, I have classes use PascalCase and variables use camelCase. Please try to stick to this
+- Please add documentation so we can build off the code in future years.

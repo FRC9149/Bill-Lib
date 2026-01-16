@@ -22,3 +22,8 @@ dependencies {
 ```
 
 Approximatly line 75.
+
+
+### Building the jar
+
+TODO

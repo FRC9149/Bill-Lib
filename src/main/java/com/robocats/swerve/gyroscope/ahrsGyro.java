@@ -5,12 +5,12 @@ import com.studica.frc.AHRS.NavXComType;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
-public class ahrsGyro implements Gyro {
+public class AhrsGyro implements Gyro {
     private AHRS gyro;
     private double offset;
     private boolean reversed;
 
-    public ahrsGyro(NavXComType portType, double offsetRadians, boolean reversed) {
+    public AhrsGyro(NavXComType portType, double offsetRadians, boolean reversed) {
         gyro = new AHRS(portType);
         offset = offsetRadians;
         this.reversed = reversed;

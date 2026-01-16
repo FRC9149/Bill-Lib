@@ -3,8 +3,8 @@ package com.robocats.swerve;
 import static edu.wpi.first.units.Units.Meter;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.robotConfig.PIDConstants;
+import com.pathplanner.lib.robotConfig.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class SwerveSubsystem extends SubsystemBase {
     // Robot swerve modules
     private final PIDController turnController = new PIDController(0.5, 0.0, 0.0);
-    private RobotConfig config;
+    private RobotConfig robotConfig;
     public final SwerveConfig swerveConfig;
 
     private SwerveModule frontLeft;
@@ -30,23 +30,23 @@ public class SwerveSubsystem extends SubsystemBase {
     private SwerveModule frontRight;
     private SwerveModule backRight;
 
-    // Odometry class for tracking robot pose
+    // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-odometry.html
     SwerveDriveOdometry odometry;
     
 
     /** Creates a 
-     * @param config the SwerveConfig record that holds information such as dimensions, max speed, and gyroscope
+     * @param robotConfig the SwerveConfig record that holds information such as dimensions, max speed, and gyroscope
      */
-    public SwerveSubsystem(SwerveConfig config, PIDController pidController) {
-        swerveConfig = config;
+    public SwerveSubsystem(SwerveConfig robotConfig, PIDController pidController) {
+        swerveConfig = robotConfig;
         initalizeSwerveModules(pidController);
         turnController.enableContinuousInput(0, 2 * Math.PI);
 
         try {
             //ngl, no idea what this does
-            //AI says it loads a config from something like smartdashboard or another interface 
+            //AI says it loads a robotConfig from something like smartdashboard or another interface 
             //This sounds right, but we don't have anything like that. so...
-          this.config = RobotConfig.fromGUISettings();
+          this.robotConfig = RobotConfig.fromGUISettings();
         } catch (Exception e) {
           e.printStackTrace();
         }
@@ -61,8 +61,7 @@ public class SwerveSubsystem extends SubsystemBase {
             swerveConfig.moduleConfig().frontLeftEncoderOffset(),
             swerveConfig.wheelDiameterMeters(),
             swerveConfig.maxAngularVelocityRadiansPerSecond(),
-            swerveConfig.moduleConfig().frontLeftEncoderReversed(),
-            pidController
+            swerveConfig.moduleConfig().frontLeftEncoderReversed()
         );
 
         backLeft = new SwerveModule(
@@ -73,8 +72,7 @@ public class SwerveSubsystem extends SubsystemBase {
             swerveConfig.moduleConfig().backLeftEncoderOffset(),
             swerveConfig.wheelDiameterMeters(),
             swerveConfig.maxAngularVelocityRadiansPerSecond(),
-            swerveConfig.moduleConfig().backLeftEncoderReversed(),
-            pidController
+            swerveConfig.moduleConfig().backLeftEncoderReversed()
         );
 
         frontRight = new SwerveModule(
@@ -85,8 +83,7 @@ public class SwerveSubsystem extends SubsystemBase {
             swerveConfig.moduleConfig().frontRightEncoderOffset(),
             swerveConfig.wheelDiameterMeters(),
             swerveConfig.maxAngularVelocityRadiansPerSecond(),
-            swerveConfig.moduleConfig().frontRightEncoderReversed(),
-            pidController
+            swerveConfig.moduleConfig().frontRightEncoderReversed()
         );
 
         backRight = new SwerveModule(
@@ -97,13 +94,12 @@ public class SwerveSubsystem extends SubsystemBase {
             swerveConfig.moduleConfig().backRightEncoderOffset(),
             swerveConfig.wheelDiameterMeters(),
             swerveConfig.maxAngularVelocityRadiansPerSecond(),
-            swerveConfig.moduleConfig().backRightEncoderReversed(),
-            pidController
+            swerveConfig.moduleConfig().backRightEncoderReversed()
         );
 
         odometry = new SwerveDriveOdometry(
             swerveConfig.driveKinematics(),
-            Rotation2d.fromRadians(0),
+            getRotation(),
             new SwerveModulePosition[] {
                     frontLeft.getPosition(),
                     frontRight.getPosition(),
@@ -331,7 +327,7 @@ His name is Jeremy...
                     new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
                     new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
             ),
-            config, // The robot configuration
+            robotConfig, // The robot configuration
             () -> {
             //   Boolean supplier that controls when the path will be mirrored for the red alliance
             //   This will flip the path being followed to the red side of the field.

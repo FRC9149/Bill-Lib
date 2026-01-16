@@ -6,14 +6,13 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+//TODO: change the function names to match the controller
+
 /**A class that allows for input with a Logitech controller
  * As used in the first 2 years of the season.
- * (maybe more, but I can't see into the future)
- * @author El Campus - grad 2026
- * @author 404.el.404@gmail.com
- * @since 2025-01-06
+ * @author El Campus
  */
-public class Logitech implements Controller {
+public class Logitech {
   //The gamepad that we are recieving inputs from
   private XboxController gamepad;
   private BooleanSupplier isX;

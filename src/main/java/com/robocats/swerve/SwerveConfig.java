@@ -1,7 +1,7 @@
 package com.robocats.swerve;
 
 import com.robocats.swerve.gyroscope.Gyro;
-import com.robocats.swerve.gyroscope.ahrsGyro;
+import com.robocats.swerve.gyroscope.AhrsGyro;
 import com.studica.frc.AHRS.NavXComType;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -26,7 +26,7 @@ public record SwerveConfig(
                 new Translation2d(-0.629 / 2, 0.629 / 2),
                 new Translation2d(0.629 / 2, 0.629 / 2)), 
             modConfig,
-            new ahrsGyro(NavXComType.kMXP_SPI, Math.PI/2, false),
+            new AhrsGyro(NavXComType.kMXP_SPI, Math.PI/2, false),
             false
         );
     }

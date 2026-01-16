@@ -3,7 +3,9 @@ package com.robocats.controllers;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-public class Streetfightercontrol implements Controller {  
+//TODO: change the function names to match the controller
+
+public class Streetfightercontrol {  
     private Joystick joystick;
     public Streetfightercontrol(int port) {
         joystick = new Joystick(port);
