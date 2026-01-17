@@ -2,6 +2,8 @@
 
 This library sparked to life as our first 3 years had rough code swerve code that kept changing. It holds everything that we use each year such as drivetrains, vision processing, controllers, etc.
 
+---
+
 ### Installation
 
 ##### Step one
@@ -23,7 +25,22 @@ dependencies {
 
 Approximatly line 75.
 
+In order to have wpilib recognize the library for autocorrect and javadocs, you have to add this line to jar in build.gradle
+`from sourceSets.main.allSource`
+```
+jar {
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    from sourceSets.main.allSource
+    ...
+    ...
+    ...
+}
+```
+
+---
 
 ### Building the jar
 
-TODO
+When the library is ready for release, build the code with `ctrl + shift + p;  WPILIB: build robot code`
+
+Next, copy the jar from `{workspace}/build/libs/Bill-Lib.jar`
