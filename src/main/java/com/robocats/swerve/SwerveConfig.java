@@ -18,14 +18,14 @@ public record SwerveConfig(
     Gyro gyroscope,
     boolean isFieldSymmetric
 ) {
-    public static SwerveConfig generic(ModuleConfig modConfig) {
+    public static SwerveConfig generic(ModuleConfig moduleConfig) {
         return new SwerveConfig(4, 3*Math.PI, .1016, TimedRobot.kDefaultPeriod,
             new SwerveDriveKinematics(
                 new Translation2d(-0.629 / 2, -0.629 / 2),
                 new Translation2d(0.629 / 2, -0.629 / 2),
                 new Translation2d(-0.629 / 2, 0.629 / 2),
                 new Translation2d(0.629 / 2, 0.629 / 2)), 
-            modConfig,
+            moduleConfig,
             new AhrsGyro(NavXComType.kMXP_SPI, Math.PI/2, false),
             false
         );

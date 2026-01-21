@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 
-//TOD : finish this class
+//TODO : finish this class
 
 // public class DDRController extends DDR {
     // /** 

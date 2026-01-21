@@ -59,7 +59,8 @@ public class SwerveSubsystem extends SubsystemBase {
             swerveConfig.moduleConfig().frontLeftEncoderOffset(),
             swerveConfig.wheelDiameterMeters(),
             swerveConfig.maxAngularVelocityRadiansPerSecond(),
-            swerveConfig.moduleConfig().frontLeftEncoderReversed()
+            swerveConfig.moduleConfig().frontLeftEncoderReversed(),
+            pidController
         );
 
         backLeft = new SwerveModule(
@@ -70,7 +71,8 @@ public class SwerveSubsystem extends SubsystemBase {
             swerveConfig.moduleConfig().backLeftEncoderOffset(),
             swerveConfig.wheelDiameterMeters(),
             swerveConfig.maxAngularVelocityRadiansPerSecond(),
-            swerveConfig.moduleConfig().backLeftEncoderReversed()
+            swerveConfig.moduleConfig().backLeftEncoderReversed(),
+            pidController
         );
 
         frontRight = new SwerveModule(
@@ -81,7 +83,8 @@ public class SwerveSubsystem extends SubsystemBase {
             swerveConfig.moduleConfig().frontRightEncoderOffset(),
             swerveConfig.wheelDiameterMeters(),
             swerveConfig.maxAngularVelocityRadiansPerSecond(),
-            swerveConfig.moduleConfig().frontRightEncoderReversed()
+            swerveConfig.moduleConfig().frontRightEncoderReversed(),
+            pidController
         );
 
         backRight = new SwerveModule(
@@ -92,7 +95,8 @@ public class SwerveSubsystem extends SubsystemBase {
             swerveConfig.moduleConfig().backRightEncoderOffset(),
             swerveConfig.wheelDiameterMeters(),
             swerveConfig.maxAngularVelocityRadiansPerSecond(),
-            swerveConfig.moduleConfig().backRightEncoderReversed()
+            swerveConfig.moduleConfig().backRightEncoderReversed(),
+            pidController
         );
 
         odometry = new SwerveDriveOdometry(
