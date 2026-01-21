@@ -89,7 +89,7 @@ public class SwerveModule {
             double maxSpeedMetersPerSecond,
             boolean motorReversed,
             PIDController test) {
-        this.turningPIDController = test;
+        this.turningPIDController = new PIDController(test.getP(), test.getI(), test.getD());
         this.name = name;
         this.maxSpeedMetersPerSecond = maxSpeedMetersPerSecond;
         this.wheelDiameterMeters = wheelDiameterMeters;
