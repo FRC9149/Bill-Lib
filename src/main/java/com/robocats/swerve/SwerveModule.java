@@ -22,14 +22,12 @@ public class SwerveModule {
     private final SparkMax driveMotor;
     //rotates the wheel to change direction
     private final SparkMax turningMotor;
-    private final SparkMaxConfig config = new SparkMaxConfig();
 
     private final RelativeEncoder driveEncoder;
 
     private final CANcoder absoluteEncoder;
 
     private final double absoluteOffset;
-    private final boolean motorReversed;
     private final double maxSpeedMetersPerSecond;
     private final double wheelDiameterMeters;
 
@@ -97,17 +95,18 @@ public class SwerveModule {
         turningMotor = new SparkMax(turningMotorPort, MotorType.kBrushless);
 
         driveEncoder = driveMotor.getEncoder();
-
-        //TODO possibly turn the absolute encoder into a class/interface so we can swap them dynamically
-        //We could also bake the offset and reversed data into the encoder
         absoluteEncoder = new CANcoder(encoderPort);
 
         absoluteOffset = encoderOffset;
-        this.motorReversed = motorReversed;
-        config.idleMode(IdleMode.kBrake);
+        SparkMaxConfig driveConfig = new SparkMaxConfig();
+        SparkMaxConfig turnConfig = new SparkMaxConfig();
+        driveConfig.idleMode(IdleMode.kBrake);
+        driveConfig.inverted(motorReversed);
+        turnConfig.idleMode(IdleMode.kBrake);
+        // turnConfig.inverted(false);
 
-        driveMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-        turningMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        driveMotor.configure(driveConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        turningMotor.configure(turnConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
         // Limit the PID Controller's input range between -pi and pi and set the input
         // to be continuous.
@@ -121,7 +120,7 @@ public class SwerveModule {
      */
     public SwerveModuleState getState() {
         return new SwerveModuleState(
-                (motorReversed ? -1 : 1) * driveEncoder.getVelocity(),
+                driveEncoder.getVelocity(),
                 new Rotation2d(getTurnDistance()));
         // original ↓↓↓
 

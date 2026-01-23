@@ -1,11 +1,11 @@
 package com.robocats.swerve;
 
-import static edu.wpi.first.units.Units.Meter;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
+import com.robocats.vision.LimelightCamera;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -17,10 +17,11 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveSubsystem extends SubsystemBase {
-    // Robot swerve modules
+    // Controls how fast the robot spins to match a certain heading
     private final PIDController turnController = new PIDController(0.5, 0.0, 0.0);
     private RobotConfig robotConfig;
     public final SwerveConfig swerveConfig;
@@ -29,86 +30,96 @@ public class SwerveSubsystem extends SubsystemBase {
     private SwerveModule backLeft;
     private SwerveModule frontRight;
     private SwerveModule backRight;
+    private LimelightCamera camera;
 
     // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-odometry.html
     SwerveDriveOdometry odometry;
-    
 
-    /** Creates a 
-     * @param robotConfig the SwerveConfig record that holds information such as dimensions, max speed, and gyroscope
+    /**
+     * Creates a
+     * 
+     * @param config        The SwerveConfig record that holds information such as
+     *                      dimensions, max speed, and gyroscope
+     * @param pidController temporary test to congifure the pidControllers for the
+     *                      turning motors
+     * @param cameraForPose If you are using a camera to detect robot pose, put it
+     *                      in here. If you don't have a camera, input null
+     * @
      */
-    public SwerveSubsystem(SwerveConfig robotConfig, PIDController pidController) {
-        swerveConfig = robotConfig;
+    public SwerveSubsystem(SwerveConfig config, PIDController pidController, LimelightCamera cameraForPose, boolean setupPathPlanner) {
+        swerveConfig = config;
+        camera = cameraForPose;
         initalizeSwerveModules(pidController);
         turnController.enableContinuousInput(0, 2 * Math.PI);
 
+        if(setupPathPlanner) {
+            setupPathPlanner();
+        }
+
         try {
-            //I believe this gets the settings from the path planner application
-          this.robotConfig = RobotConfig.fromGUISettings();
+            // I believe this gets the settings from the path planner application
+            this.robotConfig = RobotConfig.fromGUISettings();
         } catch (Exception e) {
-          e.printStackTrace();
+            e.printStackTrace();
         }
     }
 
     private void initalizeSwerveModules(PIDController pidController) {
         frontLeft = new SwerveModule(
-        "fl",
-            swerveConfig.moduleConfig().frontLeftDrivePort(),
-            swerveConfig.moduleConfig().frontLeftTurningPort(),
-            swerveConfig.moduleConfig().frontLeftEncoderPort(),
-            swerveConfig.moduleConfig().frontLeftEncoderOffset(),
-            swerveConfig.wheelDiameterMeters(),
-            swerveConfig.maxAngularVelocityRadiansPerSecond(),
-            swerveConfig.moduleConfig().frontLeftEncoderReversed(),
-            pidController
-        );
+                "fl",
+                swerveConfig.moduleConfig().frontLeftDrivePort(),
+                swerveConfig.moduleConfig().frontLeftTurningPort(),
+                swerveConfig.moduleConfig().frontLeftEncoderPort(),
+                swerveConfig.moduleConfig().frontLeftEncoderOffset(),
+                swerveConfig.wheelDiameterMeters(),
+                swerveConfig.maxAngularVelocityRadiansPerSecond(),
+                swerveConfig.moduleConfig().frontLeftEncoderReversed(),
+                pidController);
 
         backLeft = new SwerveModule(
-        "bl",
-            swerveConfig.moduleConfig().backLeftDrivePort(),
-            swerveConfig.moduleConfig().backLeftTurningPort(),
-            swerveConfig.moduleConfig().backLeftEncoderPort(),
-            swerveConfig.moduleConfig().backLeftEncoderOffset(),
-            swerveConfig.wheelDiameterMeters(),
-            swerveConfig.maxAngularVelocityRadiansPerSecond(),
-            swerveConfig.moduleConfig().backLeftEncoderReversed(),
-            pidController
-        );
+                "bl",
+                swerveConfig.moduleConfig().backLeftDrivePort(),
+                swerveConfig.moduleConfig().backLeftTurningPort(),
+                swerveConfig.moduleConfig().backLeftEncoderPort(),
+                swerveConfig.moduleConfig().backLeftEncoderOffset(),
+                swerveConfig.wheelDiameterMeters(),
+                swerveConfig.maxAngularVelocityRadiansPerSecond(),
+                swerveConfig.moduleConfig().backLeftEncoderReversed(),
+                pidController);
 
         frontRight = new SwerveModule(
-        "fr",
-            swerveConfig.moduleConfig().frontRightDrivePort(),
-            swerveConfig.moduleConfig().frontRightTurningPort(),
-            swerveConfig.moduleConfig().frontRightEncoderPort(),
-            swerveConfig.moduleConfig().frontRightEncoderOffset(),
-            swerveConfig.wheelDiameterMeters(),
-            swerveConfig.maxAngularVelocityRadiansPerSecond(),
-            swerveConfig.moduleConfig().frontRightEncoderReversed(),
-            pidController
-        );
+                "fr",
+                swerveConfig.moduleConfig().frontRightDrivePort(),
+                swerveConfig.moduleConfig().frontRightTurningPort(),
+                swerveConfig.moduleConfig().frontRightEncoderPort(),
+                swerveConfig.moduleConfig().frontRightEncoderOffset(),
+                swerveConfig.wheelDiameterMeters(),
+                swerveConfig.maxAngularVelocityRadiansPerSecond(),
+                swerveConfig.moduleConfig().frontRightEncoderReversed(),
+                pidController);
 
         backRight = new SwerveModule(
-        "br",
-            swerveConfig.moduleConfig().backRightDrivePort(),
-            swerveConfig.moduleConfig().backRightTurningPort(),
-            swerveConfig.moduleConfig().backRightEncoderPort(),
-            swerveConfig.moduleConfig().backRightEncoderOffset(),
-            swerveConfig.wheelDiameterMeters(),
-            swerveConfig.maxAngularVelocityRadiansPerSecond(),
-            swerveConfig.moduleConfig().backRightEncoderReversed(),
-            pidController
-        );
+                "br",
+                swerveConfig.moduleConfig().backRightDrivePort(),
+                swerveConfig.moduleConfig().backRightTurningPort(),
+                swerveConfig.moduleConfig().backRightEncoderPort(),
+                swerveConfig.moduleConfig().backRightEncoderOffset(),
+                swerveConfig.wheelDiameterMeters(),
+                swerveConfig.maxAngularVelocityRadiansPerSecond(),
+                swerveConfig.moduleConfig().backRightEncoderReversed(),
+                pidController);
 
         odometry = new SwerveDriveOdometry(
-            swerveConfig.driveKinematics(),
-            getRotation(),
-            new SwerveModulePosition[] {
-                    frontLeft.getPosition(),
-                    frontRight.getPosition(),
-                    backLeft.getPosition(),
-                    backRight.getPosition()
+                swerveConfig.driveKinematics(),
+                getRotation(),
+                new SwerveModulePosition[] {
+                        frontLeft.getPosition(),
+                        frontRight.getPosition(),
+                        backLeft.getPosition(),
+                        backRight.getPosition()
                 });
     }
+
 /*  Don't ask...
 His name is Jeremy...
 
@@ -146,7 +157,7 @@ His name is Jeremy...
         frontRight.periodic();
         backLeft.periodic();
         backRight.periodic();
-        
+
         odometry.update(
                 getRotation(),
                 new SwerveModulePosition[] {
@@ -157,20 +168,24 @@ His name is Jeremy...
                 });
     }
 
-    /** 
+    /**
      *
      * @return the currently-estimated pose of the robot.
      */
     public Pose2d getPose() {
-        return odometry.getPoseMeters();
+        Pose2d pose = null;
+        if (camera != null)
+            pose = camera.getRobotPose();
+
+        return pose == null ? odometry.getPoseMeters() : pose;
     }
 
     public ChassisSpeeds getChassisSpeeds() {
         return swerveConfig.driveKinematics().toChassisSpeeds(new SwerveModuleState[] {
-            frontLeft.getState(),
-            frontRight.getState(),
-            backLeft.getState(),
-            backRight.getState()
+                frontLeft.getState(),
+                frontRight.getState(),
+                backLeft.getState(),
+                backRight.getState()
         });
     }
 
@@ -203,7 +218,7 @@ His name is Jeremy...
      *                      the field.
      */
     public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-        double magnitude = Math.sqrt(xSpeed*xSpeed + ySpeed*ySpeed);
+        double magnitude = Math.sqrt(xSpeed * xSpeed + ySpeed * ySpeed);
         if (Math.abs(xSpeed) > 1 || Math.abs(ySpeed) > 1) {
             xSpeed /= magnitude;
             ySpeed /= magnitude;
@@ -215,37 +230,41 @@ His name is Jeremy...
         xSpeed *= swerveConfig.maxSpeedMetersPerSecond();
         ySpeed *= swerveConfig.maxSpeedMetersPerSecond();
         rot *= swerveConfig.maxAngularVelocityRadiansPerSecond();
-        
+
         double[] transformedX, transformedY, finalTransformed;
-        if(fieldRelative) {
+        if (fieldRelative) {
             double robotAngle = getHeading();
-            transformedX = new double[]{Math.cos(robotAngle) * xSpeed, Math.sin(robotAngle) * xSpeed}; //rotation matrix
-            transformedY = new double[]{-Math.sin(robotAngle)* ySpeed, Math.cos(robotAngle) * ySpeed};
-            finalTransformed = new double[]{transformedX[0] + transformedY[0], transformedX[1] + transformedY[1]}; //combine into 1
+            //rotate the vector of xSpeed, ySpeed by robotAngle amount of radians
+            transformedX = new double[] { Math.cos(robotAngle) * xSpeed, Math.sin(robotAngle) * xSpeed }; // rotation
+                                                                                                          // matrix
+            transformedY = new double[] { -Math.sin(robotAngle) * ySpeed, Math.cos(robotAngle) * ySpeed };
+            finalTransformed = new double[] { transformedX[0] + transformedY[0], transformedX[1] + transformedY[1] }; // combine
+                                                                                                                      // into
+                                                                                                                      // 1
         } else {
-            finalTransformed = new double[]{xSpeed, ySpeed};
+            finalTransformed = new double[] { xSpeed, ySpeed };
         }
 
         var swerveModuleStates = swerveConfig.driveKinematics().toSwerveModuleStates(
-            ChassisSpeeds.discretize(
-                new ChassisSpeeds(finalTransformed[0], finalTransformed[1], rot),
-                swerveConfig.drivePeriod()
-            )
-        );
+                ChassisSpeeds.discretize(
+                        new ChassisSpeeds(finalTransformed[0], finalTransformed[1], rot),
+                        swerveConfig.drivePeriod()));
+
+
 
         setModuleStates(swerveModuleStates);
     }
 
     public void drive(double xSpeed, double ySpeed, double xHeading, double yHeading) {
-        double headingAngle = Math.atan2(yHeading, xHeading) ;  // in radians
+        double headingAngle = Math.atan2(yHeading, xHeading); // in radians
 
-        drive (
-            xSpeed,
-            ySpeed,
-            xHeading == 0 && yHeading == 0 ? 0 : // so that when you stop pressing the right stick it'll stop spinning
-                turnController.calculate(getHeading(), headingAngle),
-            true
-        );
+        drive(
+                xSpeed,
+                ySpeed,
+                xHeading == 0 && yHeading == 0 ? 0 : // so that when you stop pressing the right stick it'll stop
+                                                     // spinning
+                        turnController.calculate(getHeading(), headingAngle),
+                true);
     }
 
     public void drive(ChassisSpeeds speeds, boolean fieldRelative) {
@@ -253,29 +272,25 @@ His name is Jeremy...
     }
 
     /**
-     * @deprecated I believe this doens't work atm
+     * @apiNote Test before competition
+     * @return A command that will drive the robot to the pose
+     * @param pose The position you want to pathfind to
      */
-    public void driveTo(Pose2d pose) {
-        Pose2d currentPose = getPose();
-        // System.out.println(currentPose.getX());
-        double x = pose.getMeasureX().minus(currentPose.getMeasureX()).in(Meter);
-        double y = pose.getMeasureY().minus(currentPose.getMeasureY()).in(Meter);
-        double r = pose.getRotation().minus(currentPose.getRotation()).getRadians();
-        // creates new x,y,and rotation values that define the translation from the robot to the desired point
-        double rotationX = Math.cos(r);
-        double rotationY = Math.sin(r);
-        double distance = Math.sqrt((x*x) + (y*y));
-        drive(x/distance, y/distance, rotationX, rotationY);
-        // drive(pose.getMeasureX().in(Meter), pose.getMeasureY().in(Meter), pose.getRotation().getRadians(), true);
+    public Command driveTo(Pose2d pose) {
+        AutoBuilder.resetOdom(getPose());
+        PathConstraints constraints = new PathConstraints(4, 4, 4, 4);
+
+        return AutoBuilder.pathfindToPose(pose, constraints);
     }
 
     /**
      * Sets the swerve ModuleStates.
+     * 
      * @param desiredStates The desired SwerveModule states.
      */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(
-            desiredStates, swerveConfig.maxSpeedMetersPerSecond());
+                desiredStates, swerveConfig.maxSpeedMetersPerSecond());
 
         frontLeft.setDesiredState(desiredStates[0]);
         frontRight.setDesiredState(desiredStates[1]);
@@ -317,32 +332,37 @@ His name is Jeremy...
     }
 
     /**
-   * Setup AutoBuilder for PathPlanner.
-   */
-  public void setupPathPlanner() {
-    AutoBuilder.configure(
-            this::getPose, // Robot pose supplier
-            this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
-            this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-            (speeds, feedforwards) -> drive(speeds, false), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
-            new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-                    new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-            ),
-            robotConfig, // The robot configuration
-            () -> {
-            //   Boolean supplier that controls when the path will be mirrored for the red alliance
-            //   This will flip the path being followed to the red side of the field.
-            //   THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+     * Setup AutoBuilder for PathPlanner.
+     */
+    public void setupPathPlanner() {
+        AutoBuilder.configure(
+                this::getPose, // Robot pose supplier
+                this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
+                this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+                (speeds, feedforwards) -> drive(speeds, false), // Method that will drive the robot given ROBOT RELATIVE
+                                                                // ChassisSpeeds. Also optionally outputs individual
+                                                                // module feedforwards
+                new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for
+                                                // holonomic drive trains
+//TODO figure out what these pid controllers do and configure them
+                        new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                        new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+                ),
+                robotConfig, // The robot configuration
+                () -> {
+                    // Boolean supplier that controls when the path will be mirrored for the red
+                    // alliance
+                    // This will flip the path being followed to the red side of the field.
+                    // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
-              var alliance = DriverStation.getAlliance();
-              if (alliance.isPresent() && !swerveConfig.isFieldSymmetric()) {
-                return alliance.get() == DriverStation.Alliance.Red;
-              }
-              return false;
-            },
-            this // Reference to this subsystem to set requirements
-    );
-    swerveConfig.gyroscope().zero(); // zero so that the robot is facing forward and not sideways
-  }
+                    var alliance = DriverStation.getAlliance();
+                    if (alliance.isPresent() && !swerveConfig.isFieldSymmetric()) {
+                        return alliance.get() == DriverStation.Alliance.Red;
+                    }
+                    return false;
+                },
+                this // Reference to this subsystem to set requirements
+        );
+        // swerveConfig.gyroscope().zero(); // zero so that the robot is facing forward and not sideways
+    }
 }
