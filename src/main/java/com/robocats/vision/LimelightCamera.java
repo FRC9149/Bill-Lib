@@ -23,18 +23,15 @@ public class LimelightCamera {
         this.cameraHeight = cameraHeight;
         this.cameraAngle = cameraAngle;
         this.tagLayout = AprilTagFieldLayout.loadField(tagLayout);
+        
         Optional<Alliance> ally = DriverStation.getAlliance();
-        if (ally.isPresent()) {
-            if (ally.get() == Alliance.Red) {
-                this.positionEstimation = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(cameraName);
-            }
-            if (ally.get() == Alliance.Blue) {
-                this.positionEstimation = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName);
-            }
-        }
-        else {
-            this.positionEstimation = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName);
-        }
+        // if we are not on a team or on blue team, use the blue pose estimate
+        // if we are on a team and not blue team, use red.
+        this.positionEstimation = !ally.isPresent() || ally.get() == Alliance.Blue ?
+            LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName) :
+            LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(cameraName);
+
+        // LimelightHelpers.SetRobotOrientation(cameraName, robotAngle, 0, 0, 0, 0, 0);
     }
 
     public Pose3d getRobotPose() {
