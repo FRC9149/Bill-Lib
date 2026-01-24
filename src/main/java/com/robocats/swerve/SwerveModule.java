@@ -31,6 +31,8 @@ public class SwerveModule {
     private final double maxSpeedMetersPerSecond;
     private final double wheelDiameterMeters;
 
+    private PIDController turningPIDController = new PIDController(.5, .01,.01);
+
     public void periodic() {
         SmartDashboard.putNumber(name + " turn encoder", getTurnDistance());
     }
@@ -56,17 +58,6 @@ public class SwerveModule {
         return rotationRad;
     }
 
-    //TODO configure PID controllers
-    private final PIDController drivePIDController = new PIDController(0.5, 0, 0);
-    private PIDController turningPIDController = new PIDController(
-            .743,
-            .385,
-            .015
-    //, new TrapezoidProfile.Constraints(
-    // ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
-    // ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared)
-    );
-
     /**
      * Constructs a SwerveModule.
      *
@@ -85,9 +76,7 @@ public class SwerveModule {
             double encoderOffset,
             double wheelDiameterMeters,
             double maxSpeedMetersPerSecond,
-            boolean motorReversed,
-            PIDController test) {
-        this.turningPIDController = new PIDController(test.getP(), test.getI(), test.getD());
+            boolean motorReversed) {
         this.name = name;
         this.maxSpeedMetersPerSecond = maxSpeedMetersPerSecond;
         this.wheelDiameterMeters = wheelDiameterMeters;
@@ -163,19 +152,8 @@ public class SwerveModule {
         // driving.
         desiredState.cosineScale(encoderRotation);
 
-        // double velocity = driveEncoder.getVelocity() 
-        //   * 60 
-        //   * 2 * Math.PI * Math.pow(wheelDiameterMeters/2, 2);
-        //Convert rpm to m/s
-        // * 60 to get into seconds
-        // * 2PI(r^2) for meters
-        // Calculate the turning motor output from the turning PID controller.
-        double velocity = driveEncoder.getVelocity() * 60 * Math.PI * wheelDiameterMeters;
-
         final double turnOutput = turningPIDController.calculate(getTurnDistance(), desiredState.angle.getRadians());
-        final double driveOutput = drivePIDController.calculate(velocity, desiredState.speedMetersPerSecond);
-        // turningPIDController.calculate(m_turningEncoder.getDistance(),
-        // desiredState.angle.getRadians());
+
 
         // Calculate the turning motor output from the turning PID controller.
         driveMotor.set(desiredState.speedMetersPerSecond);
