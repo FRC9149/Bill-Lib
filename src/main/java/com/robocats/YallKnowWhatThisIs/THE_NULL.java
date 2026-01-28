@@ -1,25 +1,33 @@
 package com.robocats.YallKnowWhatThisIs;
 
-public class THE_NULL {
+/*
+ WARNING:
+ DO NOT DELETE
+ This class is used in code and stuff WILL break if it is removed.
+ */
+
+
+
+public final class THE_NULL {
     private THE_NULL() {
 
 
         
     }
 
-    public final double NULL = 0;
-    public final double nulL = NULL;
-    public final double nuLl = NULL;
-    public final double nuLL = NULL;
-    public final double nUll = NULL;
-    public final double nUlL = NULL;
-    public final double nULl = NULL;
-    public final double nULL = NULL;
-    public final double Null = NULL;
-    public final double NulL = NULL;
-    public final double NuLl = NULL;
-    public final double NuLL = NULL;
-    public final double NUll = NULL;
-    public final double NUlL = NULL;
-    public final double NULl = NULL;
+    public static final double NULL = 0.0;
+    public static final double nulL = NULL;
+    public static final double nuLl = NULL;
+    public static final double nuLL = NULL;
+    public static final double nUll = NULL;
+    public static final double nUlL = NULL;
+    public static final double nULl = NULL;
+    public static final double nULL = NULL;
+    public static final double Null = NULL;
+    public static final double NulL = NULL;
+    public static final double NuLl = NULL;
+    public static final double NuLL = NULL;
+    public static final double NUll = NULL;
+    public static final double NUlL = NULL;
+    public static final double NULl = NULL;
 }
