@@ -5,6 +5,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
+import com.robocats.vision.AprilCamera;
 import com.robocats.vision.LimelightCamera;
 
 import edu.wpi.first.math.MathUtil;
@@ -29,7 +30,7 @@ public class SwerveSubsystem extends SubsystemBase {
     private SwerveModule backLeft;
     private SwerveModule frontRight;
     private SwerveModule backRight;
-    private LimelightCamera camera;
+    private AprilCamera camera;
 
     // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-odometry.html
     SwerveDriveOdometry odometry;
@@ -43,8 +44,9 @@ public class SwerveSubsystem extends SubsystemBase {
      *                      turning motors
      * @param cameraForPose If you are using a camera to detect robot pose, put it
      *                      in here. If you don't have a camera, input null
+     * @param setupPathPlanner Defines if pathplanner should be setup automatically. Otherwise you can call `setupPathPlanner();` yourself
      */
-    public SwerveSubsystem(SwerveConfig config, PIDController test, LimelightCamera cameraForPose, boolean setupPathPlanner) {
+    public SwerveSubsystem(SwerveConfig config, PIDController test, AprilCamera cameraForPose, boolean setupPathPlanner) {
         swerveConfig = config;
         camera = cameraForPose;
         turnController = test;
@@ -56,7 +58,7 @@ public class SwerveSubsystem extends SubsystemBase {
         }
 
         try {
-            // I believe this gets the settings from the path planner application
+            // This is the dimensions recieved from the pathplanner application
             this.robotConfig = RobotConfig.fromGUISettings();
         } catch (Exception e) {
             e.printStackTrace();
@@ -161,6 +163,10 @@ His name is Jeremy...
                         backLeft.getPosition(),
                         backRight.getPosition()
                 });
+
+        if(camera != null) {
+            camera.periodic();
+        }
     }
 
     /**
