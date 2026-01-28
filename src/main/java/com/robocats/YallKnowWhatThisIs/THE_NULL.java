@@ -1,6 +1,12 @@
 package com.robocats.YallKnowWhatThisIs;
 
-public class Null {
+public class THE_NULL {
+    private THE_NULL() {
+
+
+        
+    }
+
     public final double NULL = 0;
     public final double nulL = NULL;
     public final double nuLl = NULL;
