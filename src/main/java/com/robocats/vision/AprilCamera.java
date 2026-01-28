@@ -15,16 +15,22 @@ import edu.wpi.first.math.util.Units;
  * Times rewrote because I didn't think it through: 3
  */
 public interface AprilCamera {
-  public double getDistanceMeters();
+  /**
+   * @return The estimated position of the robot on the field.
+   */
   public Pose2d getRobotPose();
   /**
-   * @return a ChassisSpeeds that describe the motion required to face the target
+   * @return The speed your robot should turn to face a tag. Left is negative
    */
-  public ChassisSpeeds faceTag();
+  public double faceTag();
   /**
    * Saves and image of what the camera currently sees
    */
   public void screenshot();
+  /**
+  * A function that should be run every robot frame
+  */
+  public void periodic();
 }
 
 
