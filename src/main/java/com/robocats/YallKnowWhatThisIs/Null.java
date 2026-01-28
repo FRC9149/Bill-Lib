@@ -1,7 +1,7 @@
 package com.robocats.YallKnowWhatThisIs;
 
 public class Null {
-    private final double NULL = 0;
+    public final double NULL = 0;
     public final double nulL = NULL;
     public final double nuLl = NULL;
     public final double nuLL = NULL;
