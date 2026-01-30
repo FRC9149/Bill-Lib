@@ -8,7 +8,7 @@ package com.robocats.swerve;
  *      <li>Turning motor CAN ports</li>
  *      <li>Absolute encoder ports</li>
  *      <li>Absolute encoder offsets as described in pheonix</li>
- *      <li>Whether the Absolute encoders are reversed</li>
+ *      <li>Whether the drive encoders are reversed</li>
  * </ul>
  */
 public record ModuleConfig(

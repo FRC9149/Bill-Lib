@@ -1,5 +1,6 @@
 package com.robocats.controllers;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -10,121 +11,116 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * @author El Campus
  */
 public class Ps3 {
-    private XboxController cont;
+    private Joystick controller;
 
     public Ps3(int port) {
-        cont = new XboxController(port);
-    }
-
-    public Trigger onA() {
-        return new Trigger(cont::getAButton);
-    }
-
-    public Trigger onB() {
-        return new Trigger(cont::getBButton);
+        controller = new Joystick(port);
     }
 
     public Trigger onX() {
-        return new Trigger(cont::getXButton);
+        return new Trigger(() -> controller.getRawButton(1));
     }
 
-    public Trigger onY() {
-        return new Trigger(cont::getYButton);
+    public Trigger onO () {
+        return new Trigger(() -> controller.getRawButton(2));
     }
 
+    public Trigger onSquare() {
+        return new Trigger(() -> controller.getRawButton(3));
+    }
+
+    public Trigger onTriangle() {
+        return new Trigger(() -> controller.getRawButton(4));
+    }
     public Trigger onLeftBumper() {
-        return new Trigger(cont::getLeftBumperButton);
+        return new Trigger(() -> controller.getRawButton(5));
     }
-
     public Trigger onRightBumper() {
-        return new Trigger(cont::getRightBumperButton);
+        return new Trigger(() -> controller.getRawButton(6));
     }
-
-    public Trigger onBack() {
-        return new Trigger(cont::getBackButton);
+    public Trigger onSelect() {
+        return new Trigger(() -> controller.getRawButton(7));
     }
-
     public Trigger onStart() {
-        return new Trigger(cont::getStartButton);
+        return new Trigger(() -> controller.getRawButton(8));
     }
-
     public Trigger onLeftStickIn() {
-        return new Trigger(cont::getLeftStickButton);
+        return new Trigger(() -> controller.getRawButton(9));
+    }
+    public Trigger onRightStickIn() {
+        return new Trigger(() -> controller.getRawButton(10));
     }
 
-    public Trigger onRightStickIn() {
-        return new Trigger(cont::getRightStickButton);
-    }
 
     public Trigger onLeftTrigger(double threshold) {
-        return new Trigger(() -> cont.getLeftTriggerAxis() > threshold);
+        return new Trigger(() -> controller.getRawAxis(2) > threshold);
     }
 
-    public Trigger onRightTrigger(double threshold) {
-        return new Trigger(() -> cont.getRightTriggerAxis() > threshold);
-    }
-
-    public double getLeftTrigger() {
-        return cont.getLeftTriggerAxis();
-    }
-
-    public double getRightTrigger() {
-        return cont.getRightTriggerAxis();
-    }
 
     public double getLeftX() {
-        return -cont.getLeftX();
+        return controller.getRawAxis(0);
     }
 
     public double getLeftY() {
-        return cont.getLeftY();
+        return controller.getRawAxis(1);
+    }
+    public Trigger onRightTrigger(double threshold) {
+        return new Trigger(() -> controller.getRawAxis(3) > threshold);
+    }
+
+    public double getLeftTrigger() {
+        return controller.getRawAxis(2);
+    }
+
+    public double getRightTrigger() {
+        return controller.getRawAxis(3);
     }
 
     public double getRightX() {
-        return -cont.getRightX();
+        return -controller.getRawAxis(4);
     }
 
     public double getRightY() {
-        return cont.getRightY();
+        return controller.getRawAxis(5);
     }
 
     public Trigger onDPadUp() {
-        return new Trigger(() -> cont.getPOV() == 0);
+        return new Trigger(() -> controller.getPOV() == 0);
     }
 
     public Trigger onDPadUpRight() {
-        return new Trigger(() -> cont.getPOV() == 45);
+        return new Trigger(() -> controller.getPOV() == 45);
     }
 
     public Trigger onDPadRight() {
-        return new Trigger(() -> cont.getPOV() == 90);
+        return new Trigger(() -> controller.getPOV() == 90);
     }
 
     public Trigger onDPadDownRight() {
-        return new Trigger(() -> cont.getPOV() == 135);
+        return new Trigger(() -> controller.getPOV() == 135);
     }
 
     public Trigger onDPadDown() {
-        return new Trigger(() -> cont.getPOV() == 180);
+        return new Trigger(() -> controller.getPOV() == 180);
     }
 
     public Trigger onDPadDownLeft() {
-        return new Trigger(() -> cont.getPOV() == 225);
+        return new Trigger(() -> controller.getPOV() == 225);
     }
 
     public Trigger onDPadLeft() {
-        return new Trigger(() -> cont.getPOV() == 270);
+        return new Trigger(() -> controller.getPOV() == 270);
     }
 
     public Trigger onDPadUpLeft() {
-        return new Trigger(() -> cont.getPOV() == 315);
+        return new Trigger(() -> controller.getPOV() == 315);
     }
 
     public Trigger onDPadNull() {
-        return new Trigger(() -> cont.getPOV() == -1);
+        return new Trigger(() -> controller.getPOV() == -1);
     }
 
     public int getDpadAngle() {
-        return cont.getPOV();
+        return controller.getPOV();
     }
 }

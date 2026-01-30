@@ -17,8 +17,8 @@ public class RevGamePad {
     public Trigger onTriangle() { return new Trigger(() -> joystick.getRawButton(4)); }
     public Trigger onLeftBumper() { return new Trigger(() -> joystick.getRawButton(5)); }
     public Trigger onRightBumper() { return new Trigger(()-> joystick.getRawButton(6)); }
-    public Trigger onBack() { return new Trigger(()-> joystick.getRawButton(7)); }
-    public Trigger onStart() { return new Trigger(()-> joystick.getRawButton(8)); }
+    public Trigger onShare() { return new Trigger(()-> joystick.getRawButton(7)); }
+    public Trigger onOptions() { return new Trigger(()-> joystick.getRawButton(8)); }
     public Trigger onLeftStickIn() { return new Trigger(()-> joystick.getRawButton(9)); }
     public Trigger onRightStickIn() { return new Trigger(()-> joystick.getRawButton(10)); }
     public Trigger onLeftTrigger(double threshold) { return new Trigger(() -> joystick.getRawAxis(2) >= threshold); }
