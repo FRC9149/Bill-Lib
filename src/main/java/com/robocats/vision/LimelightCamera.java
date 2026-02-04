@@ -21,7 +21,6 @@ public class LimelightCamera implements AprilCamera {
     private String cameraName;
     private DoubleSupplier robotAngle;
     private DoubleSupplier robotRate;
-    private PIDController faceTagController = new PIDController(0.5, 0.01, 0.01);
 
     /**
      * @param cameraName The broadcasting name of the camera to be used
@@ -56,7 +55,7 @@ public class LimelightCamera implements AprilCamera {
             closest = f;
         }
 
-        return faceTagController.calculate(0, closest.txnc);
+        return faceTagController.calculate(closest.txnc, 0);
     }
 
     public void screenshot() {

@@ -5,6 +5,7 @@ import org.photonvision.PhotonUtils;
 import org.photonvision.struct.PhotonTrackedTargetSerde;
 import org.photonvision.targeting.PhotonPipelineResult;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -15,6 +16,7 @@ import edu.wpi.first.math.util.Units;
  * Times rewrote because I didn't think it through: 3
  */
 public interface AprilCamera {
+  final PIDController faceTagController = new PIDController(0.5, 0.01, 0.01);
   /**
    * @return The estimated position of the robot on the field.
    */
