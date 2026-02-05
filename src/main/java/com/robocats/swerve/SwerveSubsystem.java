@@ -53,15 +53,15 @@ public class SwerveSubsystem extends SubsystemBase {
         initalizeSwerveModules();
         turnController.enableContinuousInput(0, 2 * Math.PI);
 
-        if(setupPathPlanner) {
-            setupPathPlanner();
-        }
-
         try {
             // This is the dimensions recieved from the pathplanner application
             this.robotConfig = RobotConfig.fromGUISettings();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        if(setupPathPlanner) {
+            setupPathPlanner();
         }
     }
 
