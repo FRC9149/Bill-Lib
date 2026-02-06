@@ -8,6 +8,9 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.robocats.vision.AprilCamera;
 import com.robocats.vision.LimelightCamera;
 
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.RobotBase;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,6 +25,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveSubsystem extends SubsystemBase {
+
+    private final Field2d field = new Field2d(); //sets up simulation
+
     // Controls how fast the robot spins to match a certain heading
     private PIDController turnController = new PIDController(0.5, 0.0, 0.0);
     private RobotConfig robotConfig;
@@ -34,6 +40,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
     // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-odometry.html
     SwerveDriveOdometry odometry;
+
+    // ---------------- SIM STUFF ----------------
+private Pose2d simPose = new Pose2d();   // where the robot is in sim
+private SwerveModuleState[] simStates = new SwerveModuleState[4]; // what wheels are doing
 
     /**
      * Creates a
@@ -52,6 +62,8 @@ public class SwerveSubsystem extends SubsystemBase {
         turnController = test;
         initalizeSwerveModules();
         turnController.enableContinuousInput(0, 2 * Math.PI);
+
+        SmartDashboard.putData("Field", field); //makes it so that I can see the 2d field of the robot in simulation
 
         if(setupPathPlanner) {
             setupPathPlanner();
@@ -167,7 +179,41 @@ His name is Jeremy...
         if(camera != null) {
             camera.periodic();
         }
+        field.setRobotPose(getPose());//where robot is in simulation
     }
+
+    @Override
+public void simulationPeriodic() {
+
+    double dt = 0.02;
+
+    // Convert module states -> chassis speeds
+    ChassisSpeeds speeds =
+        swerveConfig.driveKinematics().toChassisSpeeds(simStates);
+
+    // Integrate pose forward
+    simPose = simPose.exp(
+        new edu.wpi.first.math.geometry.Twist2d(
+            speeds.vxMetersPerSecond * dt,
+            speeds.vyMetersPerSecond * dt,
+            speeds.omegaRadiansPerSecond * dt
+        )
+    );
+
+    // Push pose into odometry
+    odometry.resetPosition(
+        simPose.getRotation(),
+        new SwerveModulePosition[] {
+            new SwerveModulePosition(),
+            new SwerveModulePosition(),
+            new SwerveModulePosition(),
+            new SwerveModulePosition()
+        },
+        simPose
+    );
+
+    field.setRobotPose(simPose);
+}
 
     /**
      *
@@ -283,6 +329,11 @@ His name is Jeremy...
      * @param desiredStates The desired SwerveModule states.
      */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
+
+        if (RobotBase.isSimulation()) {
+        simStates = desiredStates;
+    }
+
         //front and back motors got reversed somehow
         frontLeft.setDesiredState(desiredStates[2]);
         frontRight.setDesiredState(desiredStates[3]);
