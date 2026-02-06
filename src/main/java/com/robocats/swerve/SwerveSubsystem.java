@@ -65,15 +65,17 @@ private SwerveModuleState[] simStates = new SwerveModuleState[4]; // what wheels
 
         SmartDashboard.putData("Field", field); //makes it so that I can see the 2d field of the robot in simulation
 
-        if(setupPathPlanner) {
-            setupPathPlanner();
-        }
+        
 
         try {
             // This is the dimensions recieved from the pathplanner application
             this.robotConfig = RobotConfig.fromGUISettings();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        if(setupPathPlanner) {
+            setupPathPlanner();
         }
     }
 
