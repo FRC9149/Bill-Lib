@@ -1,4 +1,4 @@
-package com.robocats.led;
+package com.robocats.LED;
 
 import java.util.function.BiConsumer;
 
