@@ -1,12 +1,21 @@
 package com.robocats.swerve;
 
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Volts;
+
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
 import com.robocats.vision.AprilCamera;
-import com.robocats.vision.LimelightCamera;
 
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -20,6 +29,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -50,6 +60,9 @@ private SwerveModuleState[] simStates = new SwerveModuleState[] {
     new SwerveModuleState()
 };
 
+    final DriveTrainSimulationConfig simConfig;
+    final SwerveDriveSimulation swerveDriveSimulation;
+
 
 
     /**
@@ -72,10 +85,33 @@ private SwerveModuleState[] simStates = new SwerveModuleState[] {
 
         SmartDashboard.putData("Field", field); //makes it so that I can see the 2d field of the robot in simulation
 
+        final DriveTrainSimulationConfig simConfig = DriveTrainSimulationConfig.Default()
+            .withGyro(COTS.ofNav2X())
+            .withSwerveModules(new SwerveModuleSimulationConfig(
+                DCMotor.getNEO(4), // drive motor
+                DCMotor.getNEO(4), // turning motor
+                6.75, // drive gear ratio
+                6.75, // turning gear ratio
+                Volts.of(0.1), //drive friction voltage
+                Volts.of(0.1), //turning friction voltage
+                Meters.of(0.1016), // wheel diameter
+                KilogramSquareMeters.of(0.03), // Steer MOI
+                1.2 // Wheel COF
+            ))
+            .withTrackLengthTrackWidth(Meters.of(0.56515), Meters.of(0.56515)) // distance between motors
+            .withBumperSize(Meters.of(0.88), Meters.of(0.88))
+        ;
+        SwerveDriveSimulation swerveDriveSimulation = new SwerveDriveSimulation(
+            simConfig,
+            new Pose2d(3, 3, new Rotation2d()) // starting pose
+        );
+        SimulatedArena.getInstance().addDriveTrainSimulation(swerveDriveSimulation);
 
-        
 
-        
+
+        if(RobotBase.isSimulation()) 
+            SimulatedArena.getInstance().resetFieldForAuto();
+
 
         try {
             // This is the dimensions recieved from the pathplanner application
@@ -194,11 +230,12 @@ His name is Jeremy...
         field.setRobotPose(getPose());//where robot is in simulation
     }
 
+
     @Override
 public void simulationPeriodic() {
 
     
-
+SimulatedArena.getInstance().simulationPeriodic();
 
     double dt = 0.02;
 
