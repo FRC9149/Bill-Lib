@@ -6,7 +6,9 @@ import static edu.wpi.first.units.Units.Volts;
 
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.SelfControlledSwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.drivesims.SelfControlledSwerveDriveSimulation.SelfControlledModuleSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 
@@ -24,6 +26,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -60,8 +63,8 @@ private SwerveModuleState[] simStates = new SwerveModuleState[] {
     new SwerveModuleState()
 };
 
-    final DriveTrainSimulationConfig simConfig;
-    final SwerveDriveSimulation swerveDriveSimulation;
+    DriveTrainSimulationConfig simConfig = null;
+    SelfControlledSwerveDriveSimulation swerveDriveSimulation = null;
 
 
 
@@ -85,32 +88,33 @@ private SwerveModuleState[] simStates = new SwerveModuleState[] {
 
         SmartDashboard.putData("Field", field); //makes it so that I can see the 2d field of the robot in simulation
 
-        simConfig = DriveTrainSimulationConfig.Default()
-            .withGyro(COTS.ofNav2X())
-            .withSwerveModules(new SwerveModuleSimulationConfig(
-                DCMotor.getNEO(4), // drive motor
-                DCMotor.getNEO(4), // turning motor
-                6.75, // drive gear ratio
-                6.75, // turning gear ratio
-                Volts.of(0.1), //drive friction voltage
-                Volts.of(0.1), //turning friction voltage
-                Meters.of(0.1016), // wheel diameter
-                KilogramSquareMeters.of(0.03), // Steer MOI
-                1.2 // Wheel COF
-            ))
-            .withTrackLengthTrackWidth(Meters.of(0.56515), Meters.of(0.56515)) // distance between motors
-            .withBumperSize(Meters.of(0.88), Meters.of(0.88))
-        ;
-        swerveDriveSimulation = new SwerveDriveSimulation(
-            simConfig,
-            new Pose2d(3, 3, new Rotation2d()) // starting pose
-        );
-        SimulatedArena.getInstance().addDriveTrainSimulation(swerveDriveSimulation);
 
 
-
-        if(RobotBase.isSimulation()) 
+        if(RobotBase.isSimulation()) {
             SimulatedArena.getInstance().resetFieldForAuto();
+
+            simConfig = DriveTrainSimulationConfig.Default()
+                .withGyro(COTS.ofNav2X())
+                .withSwerveModules(new SwerveModuleSimulationConfig(
+                    DCMotor.getNEO(4), // drive motor
+                    DCMotor.getNEO(4), // turning motor
+                    6.75, // drive gear ratio
+                    6.75, // turning gear ratio
+                    Volts.of(0.1), //drive friction voltage
+                    Volts.of(0.1), //turning friction voltage
+                    Meters.of(0.1016), // wheel diameter
+                    KilogramSquareMeters.of(0.03), // Steer MOI
+                    1.2 // Wheel COF
+                ))
+                .withTrackLengthTrackWidth(Meters.of(0.56515), Meters.of(0.56515)) // distance between motors
+                .withBumperSize(Meters.of(0.88), Meters.of(0.88))
+            ;
+            swerveDriveSimulation = new SelfControlledSwerveDriveSimulation(new SwerveDriveSimulation(
+                simConfig, 
+                new Pose2d(0, 0, new Rotation2d(0))
+            ));
+            SimulatedArena.getInstance().addDriveTrainSimulation(swerveDriveSimulation.getDriveTrainSimulation());
+        }
 
 
         try {
@@ -236,6 +240,9 @@ public void simulationPeriodic() {
 
     
 SimulatedArena.getInstance().simulationPeriodic();
+swerveDriveSimulation.periodic();
+field.setRobotPose(swerveDriveSimulation.getActualPoseInSimulationWorld());
+field.getObject("odometry").setPose(getPose());
 
     double dt = 0.02;
 
@@ -261,7 +268,7 @@ SimulatedArena.getInstance().simulationPeriodic();
      * @return the currently-estimated pose of the robot.
      */
     public Pose2d getPose() {
-        if (RobotBase.isSimulation()) return simPose;
+        if (RobotBase.isSimulation()) return swerveDriveSimulation.getOdometryEstimatedPose();
 
         Pose2d pose = null;
         if (camera != null)
@@ -271,6 +278,10 @@ SimulatedArena.getInstance().simulationPeriodic();
     }
 
     public ChassisSpeeds getChassisSpeeds() {
+        if(RobotBase.isSimulation()) {
+            return swerveDriveSimulation.getMeasuredSpeedsFieldRelative(true);
+        }
+
         return swerveConfig.driveKinematics().toChassisSpeeds(new SwerveModuleState[] {
                 frontLeft.getState(),
                 frontRight.getState(),
@@ -337,6 +348,10 @@ SimulatedArena.getInstance().simulationPeriodic();
             getRotation()   // uses sim or real gyro automatically
         )
         : new ChassisSpeeds(xSpeed, ySpeed, rot);
+
+        if(RobotBase.isSimulation()) {
+            swerveDriveSimulation.runChassisSpeeds(speeds, new Translation2d(), fieldRelative, true);
+        }
 
     // convert to module states
     SwerveModuleState[] swerveModuleStates =
@@ -405,14 +420,12 @@ SimulatedArena.getInstance().simulationPeriodic();
      */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
           
-    //SwerveModuleState fl = desiredStates[2];
-    //SwerveModuleState fr = desiredStates[3];
-    //SwerveModuleState bl = desiredStates[0];
-    //SwerveModuleState br = desiredStates[1];
-    SwerveModuleState fl = desiredStates[0];
-    SwerveModuleState fr = desiredStates[1];
-    SwerveModuleState bl = desiredStates[2];
-    SwerveModuleState br = desiredStates[3];
+    SwerveModuleState fl = desiredStates[2];
+    SwerveModuleState fr = desiredStates[3];
+    SwerveModuleState bl = desiredStates[0];
+    SwerveModuleState br = desiredStates[1];
+
+    swerveDriveSimulation.runSwerveStates(desiredStates);
 
     // ---- Send to real hardware ----
     frontLeft.setDesiredState(fl);
@@ -440,9 +453,9 @@ SimulatedArena.getInstance().simulationPeriodic();
     }
 
     public Rotation2d getRotation() {
-        if (RobotBase.isSimulation()) {
-        return simPose.getRotation();
-    }
+        if (RobotBase.isSimulation()) 
+            return swerveDriveSimulation.getDriveTrainSimulation().getGyroSimulation().getGyroReading();
+        
         // if(swerveConfig == null) {Rotation2d.fromRadians(0);}
         return swerveConfig.gyroscope().getRotation2d();
     }
@@ -453,9 +466,9 @@ SimulatedArena.getInstance().simulationPeriodic();
      * @return the robot's heading in radians, from 0 to 2PI
      */
     public double getHeading() {
-        if (RobotBase.isSimulation()) {
-        return simPose.getRotation().getRadians();
-    }
+        if (RobotBase.isSimulation()) 
+            return swerveDriveSimulation.getDriveTrainSimulation().getGyroSimulation().getGyroReading().getRadians();
+        
         return swerveConfig.gyroscope().getRadians();
     }
 
