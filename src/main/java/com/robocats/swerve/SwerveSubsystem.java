@@ -309,7 +309,7 @@ SimulatedArena.getInstance().simulationPeriodic();
      */
     public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
         System.out.println("Drive Called: X=" + xSpeed + " Y=" + ySpeed);
-        
+
         double magnitude = Math.sqrt(xSpeed * xSpeed + ySpeed * ySpeed);
         //normalize the driving inputs if they are too large
         if (magnitude > 1) {
@@ -323,6 +323,10 @@ SimulatedArena.getInstance().simulationPeriodic();
         xSpeed *= swerveConfig.maxSpeedMetersPerSecond();
         ySpeed *= swerveConfig.maxSpeedMetersPerSecond();
         rot *= swerveConfig.maxAngularVelocityRadiansPerSecond();
+
+
+
+        //--------------Stuff----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------YOU FOUND ME?!?!?!?!?!
 
 
         ChassisSpeeds speeds = fieldRelative
@@ -361,6 +365,9 @@ SimulatedArena.getInstance().simulationPeriodic();
         //123);
 
         setModuleStates(swerveModuleStates);
+       
+
+        
     }
 
     public void drive(double xSpeed, double ySpeed, double xHeading, double yHeading) {
