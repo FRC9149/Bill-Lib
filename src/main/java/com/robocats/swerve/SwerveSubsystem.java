@@ -85,7 +85,7 @@ private SwerveModuleState[] simStates = new SwerveModuleState[] {
 
         SmartDashboard.putData("Field", field); //makes it so that I can see the 2d field of the robot in simulation
 
-        final DriveTrainSimulationConfig simConfig = DriveTrainSimulationConfig.Default()
+        simConfig = DriveTrainSimulationConfig.Default()
             .withGyro(COTS.ofNav2X())
             .withSwerveModules(new SwerveModuleSimulationConfig(
                 DCMotor.getNEO(4), // drive motor
@@ -101,7 +101,7 @@ private SwerveModuleState[] simStates = new SwerveModuleState[] {
             .withTrackLengthTrackWidth(Meters.of(0.56515), Meters.of(0.56515)) // distance between motors
             .withBumperSize(Meters.of(0.88), Meters.of(0.88))
         ;
-        SwerveDriveSimulation swerveDriveSimulation = new SwerveDriveSimulation(
+        swerveDriveSimulation = new SwerveDriveSimulation(
             simConfig,
             new Pose2d(3, 3, new Rotation2d()) // starting pose
         );
