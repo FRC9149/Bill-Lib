@@ -16,6 +16,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -41,9 +42,15 @@ public class SwerveSubsystem extends SubsystemBase {
     // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-odometry.html
     SwerveDriveOdometry odometry;
 
-    // ---------------- SIM STUFF ----------------
-private Pose2d simPose = new Pose2d();   // where the robot is in sim
-private SwerveModuleState[] simStates = new SwerveModuleState[4]; // what wheels are doing
+    private Pose2d simPose = new Pose2d();
+private SwerveModuleState[] simStates = new SwerveModuleState[] {
+    new SwerveModuleState(),
+    new SwerveModuleState(),
+    new SwerveModuleState(),
+    new SwerveModuleState()
+};
+
+
 
     /**
      * Creates a
@@ -64,6 +71,9 @@ private SwerveModuleState[] simStates = new SwerveModuleState[4]; // what wheels
         turnController.enableContinuousInput(0, 2 * Math.PI);
 
         SmartDashboard.putData("Field", field); //makes it so that I can see the 2d field of the robot in simulation
+
+
+        
 
         
 
@@ -187,13 +197,14 @@ His name is Jeremy...
     @Override
 public void simulationPeriodic() {
 
+    
+
+
     double dt = 0.02;
 
-    // Convert module states -> chassis speeds
     ChassisSpeeds speeds =
         swerveConfig.driveKinematics().toChassisSpeeds(simStates);
 
-    // Integrate pose forward
     simPose = simPose.exp(
         new edu.wpi.first.math.geometry.Twist2d(
             speeds.vxMetersPerSecond * dt,
@@ -202,26 +213,19 @@ public void simulationPeriodic() {
         )
     );
 
-    // Push pose into odometry
-    odometry.resetPosition(
-        simPose.getRotation(),
-        new SwerveModulePosition[] {
-            new SwerveModulePosition(),
-            new SwerveModulePosition(),
-            new SwerveModulePosition(),
-            new SwerveModulePosition()
-        },
-        simPose
-    );
-
     field.setRobotPose(simPose);
+    System.out.println("Sim Pose: " + simPose.toString());
 }
+
+   
 
     /**
      *
      * @return the currently-estimated pose of the robot.
      */
     public Pose2d getPose() {
+        if (RobotBase.isSimulation()) return simPose;
+
         Pose2d pose = null;
         if (camera != null)
             pose = camera.getRobotPose();
@@ -267,6 +271,8 @@ public void simulationPeriodic() {
      *                      the field.
      */
     public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+        System.out.println("Drive Called: X=" + xSpeed + " Y=" + ySpeed);
+        
         double magnitude = Math.sqrt(xSpeed * xSpeed + ySpeed * ySpeed);
         //normalize the driving inputs if they are too large
         if (magnitude > 1) {
@@ -281,18 +287,41 @@ public void simulationPeriodic() {
         ySpeed *= swerveConfig.maxSpeedMetersPerSecond();
         rot *= swerveConfig.maxAngularVelocityRadiansPerSecond();
 
-        double rotatedX = xSpeed, rotatedY = ySpeed;
-        if (fieldRelative) {
-            double robotAngle = getHeading();
 
-            rotatedX = Math.cos(robotAngle) * xSpeed - ySpeed * Math.sin(robotAngle);
-            rotatedY = Math.sin(robotAngle) * xSpeed + ySpeed * Math.cos(robotAngle);
-            //rotate the drive inputs based on the robot angle
-        }
+        ChassisSpeeds speeds = fieldRelative
+        ? ChassisSpeeds.fromFieldRelativeSpeeds(
+            xSpeed,
+            ySpeed,
+            rot,
+            getRotation()   // uses sim or real gyro automatically
+        )
+        : new ChassisSpeeds(xSpeed, ySpeed, rot);
 
-        SwerveModuleState[] swerveModuleStates = swerveConfig.driveKinematics().toSwerveModuleStates(
-            new ChassisSpeeds(rotatedX, rotatedY, rot)
-        );
+    // convert to module states
+    SwerveModuleState[] swerveModuleStates =
+        swerveConfig.driveKinematics().toSwerveModuleStates(speeds);
+
+    // keep speeds legal
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        swerveModuleStates,
+        swerveConfig.maxSpeedMetersPerSecond()
+    );
+
+
+        //----------------The Great El's awesome code that I currently have commented out and marked for easy finding--------------------------
+
+        //123double rotatedX = xSpeed, rotatedY = ySpeed;
+        //123if (fieldRelative) {
+        //123    double robotAngle = getHeading();
+//123
+        //123    rotatedX = Math.cos(robotAngle) * xSpeed - ySpeed * Math.sin(robotAngle);
+        //123    rotatedY = Math.sin(robotAngle) * xSpeed + ySpeed * Math.cos(robotAngle);
+        //123    //rotate the drive inputs based on the robot angle
+        //123}
+//123
+        //123SwerveModuleState[] swerveModuleStates = swerveConfig.driveKinematics().toSwerveModuleStates(
+        //123    new ChassisSpeeds(rotatedX, rotatedY, rot)
+        //123);
 
         setModuleStates(swerveModuleStates);
     }
@@ -331,16 +360,29 @@ public void simulationPeriodic() {
      * @param desiredStates The desired SwerveModule states.
      */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
+          
+    //SwerveModuleState fl = desiredStates[2];
+    //SwerveModuleState fr = desiredStates[3];
+    //SwerveModuleState bl = desiredStates[0];
+    //SwerveModuleState br = desiredStates[1];
+    SwerveModuleState fl = desiredStates[0];
+    SwerveModuleState fr = desiredStates[1];
+    SwerveModuleState bl = desiredStates[2];
+    SwerveModuleState br = desiredStates[3];
 
-        if (RobotBase.isSimulation()) {
-        simStates = desiredStates;
+    // ---- Send to real hardware ----
+    frontLeft.setDesiredState(fl);
+    frontRight.setDesiredState(fr);
+    backLeft.setDesiredState(bl);
+    backRight.setDesiredState(br);
+
+    // ---- Send the SAME states to simulation ----
+    if (RobotBase.isSimulation()) {
+        simStates[0] = fl;
+        simStates[1] = fr;
+        simStates[2] = bl;
+        simStates[3] = br;
     }
-
-        //front and back motors got reversed somehow
-        frontLeft.setDesiredState(desiredStates[2]);
-        frontRight.setDesiredState(desiredStates[3]);
-        backLeft.setDesiredState(desiredStates[0]);
-        backRight.setDesiredState(desiredStates[1]);
     }
 
     /**
@@ -354,6 +396,9 @@ public void simulationPeriodic() {
     }
 
     public Rotation2d getRotation() {
+        if (RobotBase.isSimulation()) {
+        return simPose.getRotation();
+    }
         // if(swerveConfig == null) {Rotation2d.fromRadians(0);}
         return swerveConfig.gyroscope().getRotation2d();
     }
@@ -364,6 +409,9 @@ public void simulationPeriodic() {
      * @return the robot's heading in radians, from 0 to 2PI
      */
     public double getHeading() {
+        if (RobotBase.isSimulation()) {
+        return simPose.getRotation().getRadians();
+    }
         return swerveConfig.gyroscope().getRadians();
     }
 
