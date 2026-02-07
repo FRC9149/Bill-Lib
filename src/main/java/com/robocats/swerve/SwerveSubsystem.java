@@ -1,4 +1,6 @@
 package com.robocats.swerve;
+//Maple sim documentation:
+// https://shenzhen-robotics-alliance.github.io/maple-sim/
 
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
@@ -63,8 +65,8 @@ private SwerveModuleState[] simStates = new SwerveModuleState[] {
     new SwerveModuleState()
 };
 
-    DriveTrainSimulationConfig simConfig = null;
-    SelfControlledSwerveDriveSimulation swerveDriveSimulation = null;
+    final DriveTrainSimulationConfig simConfig;
+    final SelfControlledSwerveDriveSimulation swerveDriveSimulation;
 
 
 
@@ -114,6 +116,9 @@ private SwerveModuleState[] simStates = new SwerveModuleState[] {
                 new Pose2d(0, 0, new Rotation2d(0))
             ));
             SimulatedArena.getInstance().addDriveTrainSimulation(swerveDriveSimulation.getDriveTrainSimulation());
+        } else {
+            swerveDriveSimulation = null;
+            simConfig = null;
         }
 
 
@@ -231,35 +236,16 @@ His name is Jeremy...
         if(camera != null) {
             camera.periodic();
         }
-        field.setRobotPose(getPose());//where robot is in simulation
     }
 
 
     @Override
-public void simulationPeriodic() {
-
-    
-SimulatedArena.getInstance().simulationPeriodic();
-swerveDriveSimulation.periodic();
-field.setRobotPose(swerveDriveSimulation.getActualPoseInSimulationWorld());
-field.getObject("odometry").setPose(getPose());
-
-    double dt = 0.02;
-
-    ChassisSpeeds speeds =
-        swerveConfig.driveKinematics().toChassisSpeeds(simStates);
-
-    simPose = simPose.exp(
-        new edu.wpi.first.math.geometry.Twist2d(
-            speeds.vxMetersPerSecond * dt,
-            speeds.vyMetersPerSecond * dt,
-            speeds.omegaRadiansPerSecond * dt
-        )
-    );
-
-    field.setRobotPose(simPose);
-    System.out.println("Sim Pose: " + simPose.toString());
-}
+    public void simulationPeriodic() {
+        SimulatedArena.getInstance().simulationPeriodic();
+        swerveDriveSimulation.periodic();
+        field.setRobotPose(swerveDriveSimulation.getActualPoseInSimulationWorld());
+        field.getObject("odometry").setPose(getPose());
+    }
 
    
 
@@ -268,19 +254,15 @@ field.getObject("odometry").setPose(getPose());
      * @return the currently-estimated pose of the robot.
      */
     public Pose2d getPose() {
-        if (RobotBase.isSimulation()) return swerveDriveSimulation.getOdometryEstimatedPose();
+        if (RobotBase.isSimulation()) 
+            return swerveDriveSimulation.getOdometryEstimatedPose();
 
-        Pose2d pose = null;
-        if (camera != null)
-            pose = camera.getRobotPose();
-
-        return pose == null ? odometry.getPoseMeters() : pose;
+        return camera != null ? camera.getRobotPose() : odometry.getPoseMeters();
     }
 
     public ChassisSpeeds getChassisSpeeds() {
-        if(RobotBase.isSimulation()) {
+        if(RobotBase.isSimulation()) 
             return swerveDriveSimulation.getMeasuredSpeedsFieldRelative(true);
-        }
 
         return swerveConfig.driveKinematics().toChassisSpeeds(new SwerveModuleState[] {
                 frontLeft.getState(),
@@ -335,9 +317,6 @@ field.getObject("odometry").setPose(getPose());
         ySpeed *= swerveConfig.maxSpeedMetersPerSecond();
         rot *= swerveConfig.maxAngularVelocityRadiansPerSecond();
 
-
-
-        //--------------Stuff----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------YOU FOUND ME?!?!?!?!?!
 
 
         ChassisSpeeds speeds = fieldRelative
