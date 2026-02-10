@@ -301,7 +301,7 @@ His name is Jeremy...
      *                      the field.
      */
     public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-        System.out.println("Drive Called: X=" + xSpeed + " Y=" + ySpeed);
+        //System.out.println("Drive Called: X=" + xSpeed + " Y=" + ySpeed);
 
         double magnitude = Math.sqrt(xSpeed * xSpeed + ySpeed * ySpeed);
         //normalize the driving inputs if they are too large
