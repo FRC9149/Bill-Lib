@@ -4,9 +4,14 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -14,6 +19,9 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.sim.CANcoderSimState;
+
+
 
 public class SwerveModule {
 
@@ -30,6 +38,8 @@ public class SwerveModule {
     private final double absoluteOffset;
     private final double maxSpeedMetersPerSecond;
     private final double wheelDiameterMeters;
+
+  
 
     private PIDController turningPIDController = new PIDController(.5, .01,.01);
 
@@ -86,6 +96,9 @@ public class SwerveModule {
         driveEncoder = driveMotor.getEncoder();
         absoluteEncoder = new CANcoder(encoderPort);
 
+
+        
+
         absoluteOffset = encoderOffset;
         SparkMaxConfig driveConfig = new SparkMaxConfig();
         SparkMaxConfig turnConfig = new SparkMaxConfig();
@@ -100,8 +113,7 @@ public class SwerveModule {
         // Limit the PID Controller's input range between -pi and pi and set the input
         // to be continuous.
         turningPIDController.enableContinuousInput(0, 2 * Math.PI);
-    }
-
+            }
     /**
      * Returns the current state of the module.
      *
@@ -166,4 +178,6 @@ public class SwerveModule {
     public void resetEncoders() {
         driveEncoder.setPosition(0);
     }
+
+    
 }
