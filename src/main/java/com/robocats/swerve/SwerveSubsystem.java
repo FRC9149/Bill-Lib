@@ -85,7 +85,7 @@ private SwerveModuleState[] simStates = new SwerveModuleState[] {
         swerveConfig = config;
         camera = cameraForPose;
         turnController = test;
-        initalizeSwerveModules();
+        
         turnController.enableContinuousInput(0, 2 * Math.PI);
 
         SmartDashboard.putData("Field", field); //makes it so that I can see the 2d field of the robot in simulation
@@ -121,7 +121,7 @@ private SwerveModuleState[] simStates = new SwerveModuleState[] {
             simConfig = null;
         }
 
-
+initalizeSwerveModules();
         try {
             // This is the dimensions recieved from the pathplanner application
             this.robotConfig = RobotConfig.fromGUISettings();
@@ -374,6 +374,8 @@ His name is Jeremy...
                                                      // spinning
                         turnController.calculate(getHeading(), headingAngle),
                 true);
+        System.out.println("drive");
+
     }
 
     public void drive(ChassisSpeeds speeds, boolean fieldRelative) {
@@ -404,7 +406,9 @@ His name is Jeremy...
     SwerveModuleState bl = desiredStates[0];
     SwerveModuleState br = desiredStates[1];
 
-    swerveDriveSimulation.runSwerveStates(desiredStates);
+    //if(RobotBase.isSimulation()) {
+    //    swerveDriveSimulation.runSwerveStates(desiredStates);
+    //}
 
     // ---- Send to real hardware ----
     frontLeft.setDesiredState(fl);
