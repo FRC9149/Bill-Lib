@@ -1,10 +1,5 @@
 package com.robocats.vision;
 
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonUtils;
-import org.photonvision.struct.PhotonTrackedTargetSerde;
-import org.photonvision.targeting.PhotonPipelineResult;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
