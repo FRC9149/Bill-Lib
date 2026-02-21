@@ -14,7 +14,7 @@ public interface Gyro {
      */
     public double getRadians();
     /**
-     * @return TODO add what Rate is
+     * @return The angular velocity of the robot (TODO add units)
      */
     public double getRate();
     /**

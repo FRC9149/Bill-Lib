@@ -41,7 +41,7 @@ public class SwerveModule {
 
   
 
-    private PIDController turningPIDController = new PIDController(.5, .01,.01);
+    private PIDController turningPIDController = new PIDController(.5, .0,.0);
 
     public void periodic() {
         SmartDashboard.putNumber(name + " turn encoder", getTurnDistance());

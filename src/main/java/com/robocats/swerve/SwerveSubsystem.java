@@ -301,7 +301,6 @@ His name is Jeremy...
      *                      the field.
      */
     public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-        //System.out.println("Drive Called: X=" + xSpeed + " Y=" + ySpeed);
 
         double magnitude = Math.sqrt(xSpeed * xSpeed + ySpeed * ySpeed);
         //normalize the driving inputs if they are too large
@@ -313,55 +312,45 @@ His name is Jeremy...
         rot = MathUtil.clamp(rot, -1, 1);
 
         // apply the max speeds
-        xSpeed *= swerveConfig.maxSpeedMetersPerSecond();
-        ySpeed *= swerveConfig.maxSpeedMetersPerSecond();
-        rot *= swerveConfig.maxAngularVelocityRadiansPerSecond();
+        // xSpeed *= swerveConfig.maxSpeedMetersPerSecond();
+        // ySpeed *= swerveConfig.maxSpeedMetersPerSecond();
+        // rot *= swerveConfig.maxAngularVelocityRadiansPerSecond();
+        System.out.println("Drive Called: X=" + xSpeed + " Y=" + ySpeed + " Max: " + swerveConfig.maxSpeedMetersPerSecond());
 
 
 
-        ChassisSpeeds speeds = fieldRelative
-        ? ChassisSpeeds.fromFieldRelativeSpeeds(
-            xSpeed,
-            ySpeed,
-            rot,
-            getRotation()   // uses sim or real gyro automatically
-        )
-        : new ChassisSpeeds(xSpeed, ySpeed, rot);
 
-        if(RobotBase.isSimulation()) {
-            swerveDriveSimulation.runChassisSpeeds(speeds, new Translation2d(), fieldRelative, true);
-        }
+        // ChassisSpeeds speeds = fieldRelative
+        // ? ChassisSpeeds.fromFieldRelativeSpeeds(
+            // xSpeed,
+            // ySpeed,
+            // rot,
+            // getRotation()   // uses sim or real gyro automatically
+        // )
+        // : new ChassisSpeeds(xSpeed, ySpeed, rot);
+// 
+        // if(RobotBase.isSimulation()) {
+            // swerveDriveSimulation.runChassisSpeeds(speeds, new Translation2d(), fieldRelative, true);
+        // }
 
-    // convert to module states
-    SwerveModuleState[] swerveModuleStates =
-        swerveConfig.driveKinematics().toSwerveModuleStates(speeds);
-
-    // keep speeds legal
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates,
-        swerveConfig.maxSpeedMetersPerSecond()
-    );
 
 
         //----------------The Great El's awesome code that I currently have commented out and marked for easy finding--------------------------
 
-        //123double rotatedX = xSpeed, rotatedY = ySpeed;
-        //123if (fieldRelative) {
-        //123    double robotAngle = getHeading();
-//123
-        //123    rotatedX = Math.cos(robotAngle) * xSpeed - ySpeed * Math.sin(robotAngle);
-        //123    rotatedY = Math.sin(robotAngle) * xSpeed + ySpeed * Math.cos(robotAngle);
-        //123    //rotate the drive inputs based on the robot angle
-        //123}
-//123
-        //123SwerveModuleState[] swerveModuleStates = swerveConfig.driveKinematics().toSwerveModuleStates(
-        //123    new ChassisSpeeds(rotatedX, rotatedY, rot)
-        //123);
+        double rotatedX = xSpeed, rotatedY = ySpeed;
+        if (fieldRelative) {
+            double robotAngle = getHeading();
 
-        setModuleStates(swerveModuleStates);
-       
+            rotatedX = Math.cos(robotAngle) * xSpeed - ySpeed * Math.sin(robotAngle);
+            rotatedY = Math.sin(robotAngle) * xSpeed + ySpeed * Math.cos(robotAngle);
+            //rotate the drive inputs based on the robot angle
+        }
 
-        
+        SwerveModuleState[] swerveModuleStates = swerveConfig.driveKinematics().toSwerveModuleStates(
+            new ChassisSpeeds(rotatedX, rotatedY, rot)
+        );
+
+        setModuleStates(swerveModuleStates);        
     }
 
     public void drive(double xSpeed, double ySpeed, double xHeading, double yHeading) {
@@ -374,8 +363,6 @@ His name is Jeremy...
                                                      // spinning
                         turnController.calculate(getHeading(), headingAngle),
                 true);
-        System.out.println("drive");
-
     }
 
     public void drive(ChassisSpeeds speeds, boolean fieldRelative) {
