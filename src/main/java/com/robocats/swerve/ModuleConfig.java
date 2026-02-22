@@ -7,7 +7,6 @@ package com.robocats.swerve;
  *      <li>Drive motor CAN ports</li>
  *      <li>Turning motor CAN ports</li>
  *      <li>Absolute encoder ports</li>
- *      <li>Absolute encoder offsets as described in pheonix</li>
  *      <li>Whether the drive encoders are reversed</li>
  * </ul>
  */
@@ -26,11 +25,6 @@ public record ModuleConfig(
     int backLeftEncoderPort,
     int frontRightEncoderPort,
     int backRightEncoderPort,
-
-    double frontLeftEncoderOffset,
-    double backLeftEncoderOffset,
-    double frontRightEncoderOffset,
-    double backRightEncoderOffset,
 
     boolean frontLeftEncoderReversed,
     boolean backLeftEncoderReversed,
