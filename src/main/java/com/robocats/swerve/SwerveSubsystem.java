@@ -140,7 +140,6 @@ initalizeSwerveModules();
                 swerveConfig.moduleConfig().frontLeftDrivePort(),
                 swerveConfig.moduleConfig().frontLeftTurningPort(),
                 swerveConfig.moduleConfig().frontLeftEncoderPort(),
-                swerveConfig.moduleConfig().frontLeftEncoderOffset(),
                 swerveConfig.wheelDiameterMeters(),
                 swerveConfig.maxAngularVelocityRadiansPerSecond(),
                 swerveConfig.moduleConfig().frontLeftEncoderReversed());
@@ -150,7 +149,6 @@ initalizeSwerveModules();
                 swerveConfig.moduleConfig().backLeftDrivePort(),
                 swerveConfig.moduleConfig().backLeftTurningPort(),
                 swerveConfig.moduleConfig().backLeftEncoderPort(),
-                swerveConfig.moduleConfig().backLeftEncoderOffset(),
                 swerveConfig.wheelDiameterMeters(),
                 swerveConfig.maxAngularVelocityRadiansPerSecond(),
                 swerveConfig.moduleConfig().backLeftEncoderReversed());
@@ -160,7 +158,6 @@ initalizeSwerveModules();
                 swerveConfig.moduleConfig().frontRightDrivePort(),
                 swerveConfig.moduleConfig().frontRightTurningPort(),
                 swerveConfig.moduleConfig().frontRightEncoderPort(),
-                swerveConfig.moduleConfig().frontRightEncoderOffset(),
                 swerveConfig.wheelDiameterMeters(),
                 swerveConfig.maxAngularVelocityRadiansPerSecond(),
                 swerveConfig.moduleConfig().frontRightEncoderReversed());
@@ -170,7 +167,6 @@ initalizeSwerveModules();
                 swerveConfig.moduleConfig().backRightDrivePort(),
                 swerveConfig.moduleConfig().backRightTurningPort(),
                 swerveConfig.moduleConfig().backRightEncoderPort(),
-                swerveConfig.moduleConfig().backRightEncoderOffset(),
                 swerveConfig.wheelDiameterMeters(),
                 swerveConfig.maxAngularVelocityRadiansPerSecond(),
                 swerveConfig.moduleConfig().backRightEncoderReversed());
@@ -248,11 +244,6 @@ His name is Jeremy...
     }
 
    
-
-    /**
-     *
-     * @return the currently-estimated pose of the robot.
-     */
     public Pose2d getPose() {
         if (RobotBase.isSimulation()) 
             return swerveDriveSimulation.getOdometryEstimatedPose();
@@ -376,7 +367,11 @@ His name is Jeremy...
      */
     public Command driveTo(Pose2d pose) {
         AutoBuilder.resetOdom(getPose());
-        PathConstraints constraints = new PathConstraints(4, 4, 4, 4);
+        PathConstraints constraints = new PathConstraints(
+            swerveConfig.maxSpeedMetersPerSecond(), 
+            1, 
+            swerveConfig.maxAngularVelocityRadiansPerSecond(), 
+            1);
 
         return AutoBuilder.pathfindToPose(pose, constraints);
     }
@@ -483,6 +478,5 @@ His name is Jeremy...
                 },
                 this // Reference to this subsystem to set requirements
         );
-        // swerveConfig.gyroscope().zero(); // zero so that the robot is facing forward and not sideways
     }
 }
