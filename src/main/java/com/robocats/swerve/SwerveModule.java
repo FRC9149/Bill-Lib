@@ -33,7 +33,7 @@ public class SwerveModule {
 
     private final SparkMax turnMotor; // rotates the wheel to change direction
     private final CANcoder absoluteEncoder;
-    private final PIDController turnController = new PIDController(0.5, 0.1, 0.1);
+    private final PIDController turnController = new PIDController(0.01, 0, 0);
     private SparkMaxConfig turnConfig = new SparkMaxConfig();
 
     private final double maxSpeedMetersPerSecond;
@@ -129,12 +129,13 @@ public class SwerveModule {
         // Scale speed by cosine of angle error. This scales down movement perpendicular
         // to the desired direction of travel that can occur when modules change
         // directions. This results in smoother driving.
-        desiredState.cosineScale(encoderRotation);
+        // desiredState.cosineScale(encoderRotation);
 
-        final double turnOutput = turningPIDController.calculate(getTurnDistance(), desiredState.angle.getRadians());
+        final double turnOutput = turnController.calculate(getTurnDistance(), desiredState.angle.getRadians() + Math.PI );
         SmartDashboard.putNumber(name + " Commanded Delta (Rad)", turnOutput);
-
-        driveMotor.set(desiredState.speedMetersPerSecond / maxSpeedMetersPerSecond);
+        SmartDashboard.putNumber(name + "driveSpeed", desiredState.speedMetersPerSecond);
+        
+        driveMotor.set(desiredState.speedMetersPerSecond);
         turnMotor.set(turnOutput);
     }
 
