@@ -154,6 +154,9 @@ public class SwerveModule {
     public void setDesiredState(SwerveModuleState desiredState) {
         var encoderRotation = new Rotation2d(getTurnDistance());
 
+        SmartDashboard.putNumber(name + " CURRENT ENCODER ANGLE RADIANS", encoderRotation.getRadians());
+         SmartDashboard.putNumber(name + " DESIRED ANGLE RADIANS", desiredState.angle.getRadians());
+
         // Optimize the reference state to avoid spinning further than 90 degrees
         desiredState.optimize(encoderRotation);
 
@@ -165,6 +168,7 @@ public class SwerveModule {
         desiredState.cosineScale(encoderRotation);
 
         final double turnOutput = turningPIDController.calculate(getTurnDistance(), desiredState.angle.getRadians());
+        SmartDashboard.putNumber(name + " Commanded Delta (Rad)", turnOutput);
 
 
         // Calculate the turning motor output from the turning PID controller.

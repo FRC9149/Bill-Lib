@@ -121,7 +121,7 @@ private SwerveModuleState[] simStates = new SwerveModuleState[] {
             simConfig = null;
         }
 
-initalizeSwerveModules();
+        initalizeSwerveModules();
         try {
             // This is the dimensions recieved from the pathplanner application
             this.robotConfig = RobotConfig.fromGUISettings();
@@ -301,7 +301,6 @@ His name is Jeremy...
      *                      the field.
      */
     public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-
         double magnitude = Math.sqrt(xSpeed * xSpeed + ySpeed * ySpeed);
         //normalize the driving inputs if they are too large
         if (magnitude > 1) {
@@ -312,12 +311,15 @@ His name is Jeremy...
         rot = MathUtil.clamp(rot, -1, 1);
 
         // apply the max speeds
-        // xSpeed *= swerveConfig.maxSpeedMetersPerSecond();
-        // ySpeed *= swerveConfig.maxSpeedMetersPerSecond();
-        // rot *= swerveConfig.maxAngularVelocityRadiansPerSecond();
-        System.out.println("Drive Called: X=" + xSpeed + " Y=" + ySpeed + " Max: " + swerveConfig.maxSpeedMetersPerSecond());
+        xSpeed *= swerveConfig.maxSpeedMetersPerSecond();
+        ySpeed *= swerveConfig.maxSpeedMetersPerSecond();
+        rot *= swerveConfig.maxAngularVelocityRadiansPerSecond();
+        SmartDashboard.putNumber("maxSpeed", swerveConfig.maxSpeedMetersPerSecond());
+        // System.out.println("Drive Called: X=" + xSpeed + " Y=" + ySpeed + " Max: " + swerveConfig.maxSpeedMetersPerSecond());
 
 
+        SmartDashboard.putNumber("DriveX", xSpeed);
+        SmartDashboard.putNumber("DriveY", ySpeed);
 
 
         // ChassisSpeeds speeds = fieldRelative
@@ -352,6 +354,7 @@ His name is Jeremy...
 
         setModuleStates(swerveModuleStates);        
     }
+
 
     public void drive(double xSpeed, double ySpeed, double xHeading, double yHeading) {
         double headingAngle = Math.atan2(yHeading, xHeading) + Math.PI; // in radians
@@ -388,10 +391,10 @@ His name is Jeremy...
      */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
           
-    SwerveModuleState fl = desiredStates[2];
-    SwerveModuleState fr = desiredStates[3];
-    SwerveModuleState bl = desiredStates[0];
-    SwerveModuleState br = desiredStates[1];
+    SwerveModuleState fl = desiredStates[2]; //2
+    SwerveModuleState fr = desiredStates[3]; //3
+    SwerveModuleState bl = desiredStates[0]; //0
+    SwerveModuleState br = desiredStates[1]; //1
 
     //if(RobotBase.isSimulation()) {
     //    swerveDriveSimulation.runSwerveStates(desiredStates);
