@@ -18,6 +18,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -33,7 +34,8 @@ public class SwerveModule {
 
     private final SparkMax turnMotor; // rotates the wheel to change direction
     private final CANcoder absoluteEncoder;
-    private final PIDController turnController = new PIDController(0.01, 0, 0);
+    private final SparkClosedLoopController turnController;
+    // private final PIDController turnController = new PIDController(0.01, 0, 0);
     private SparkMaxConfig turnConfig = new SparkMaxConfig();
 
     private final double maxSpeedMetersPerSecond;
@@ -77,7 +79,12 @@ public class SwerveModule {
 
         turnConfig.idleMode(IdleMode.kBrake);
         turnMotor.configure(turnConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-        turnController.enableContinuousInput(0, 2 * Math.PI);
+
+        ClosedLoopConfig turnControllerConfig = new ClosedLoopConfig();
+        turnControllerConfig.pid(0.1, 0, 0);
+        turnController = turnMotor.getClosedLoopController();
+        turnControllerConfig.apply(turnControllerConfig);
+        turnMotor.getEncoder().setPosition(absoluteEncoder.getAbsolutePosition().getValueAsDouble());
     }
 
     public void periodic() {
@@ -131,12 +138,13 @@ public class SwerveModule {
         // directions. This results in smoother driving.
         // desiredState.cosineScale(encoderRotation);
 
-        final double turnOutput = turnController.calculate(getTurnDistance(), desiredState.angle.getRadians() + Math.PI );
-        SmartDashboard.putNumber(name + " Commanded Delta (Rad)", turnOutput);
+        // final double turnOutput = turnController.calculate(getTurnDistance(), desiredState.angle.getRadians() + Math.PI );
+        turnController.setSetpoint(desiredState.angle.getRotations(), ControlType.kPosition);
+        // SmartDashboard.putNumber(name + " Commanded Delta (Rad)", turnOutput);
         SmartDashboard.putNumber(name + "driveSpeed", desiredState.speedMetersPerSecond);
-        
+
         driveMotor.set(desiredState.speedMetersPerSecond);
-        turnMotor.set(turnOutput);
+        // turnMotor.set(turnOutput);
     }
 
     /**

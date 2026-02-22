@@ -386,10 +386,10 @@ His name is Jeremy...
      */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
           
-    SwerveModuleState fl = desiredStates[0]; //2
-    SwerveModuleState fr = desiredStates[2]; //3
-    SwerveModuleState bl = desiredStates[1]; //0
-    SwerveModuleState br = desiredStates[3]; //1
+    SwerveModuleState fl = desiredStates[2]; //2
+    SwerveModuleState fr = desiredStates[3]; //3
+    SwerveModuleState bl = desiredStates[0]; //0
+    SwerveModuleState br = desiredStates[1]; //1
 
     //if(RobotBase.isSimulation()) {
     //    swerveDriveSimulation.runSwerveStates(desiredStates);
