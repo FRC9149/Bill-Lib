@@ -19,6 +19,7 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig;
+import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -35,7 +36,7 @@ public class SwerveModule {
     private final SparkMax turnMotor; // rotates the wheel to change direction
     private final CANcoder absoluteEncoder;
     private final SparkClosedLoopController turnController;
-    // private final PIDController turnController = new PIDController(0.01, 0, 0);
+    private final RelativeEncoder turnEncoder;
     private SparkMaxConfig turnConfig = new SparkMaxConfig();
 
     private final double maxSpeedMetersPerSecond;
@@ -61,30 +62,34 @@ public class SwerveModule {
             int encoderPort,
             double wheelDiameterMeters,
             double maxSpeedMetersPerSecond,
-            boolean motorReversed) {
-
+            boolean motorReversed) 
+    {
         this.name = name;
         this.maxSpeedMetersPerSecond = maxSpeedMetersPerSecond;
         this.wheelDiameterMeters = wheelDiameterMeters;
+
 
         driveMotor = new SparkMax(driveMotorPort, MotorType.kBrushless);
         driveEncoder = driveMotor.getEncoder();
 
         driveConfig.idleMode(IdleMode.kBrake);
         driveConfig.inverted(motorReversed);
-        driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
 
         turnMotor = new SparkMax(turningMotorPort, MotorType.kBrushless);
+        turnEncoder = turnMotor.getEncoder();
         absoluteEncoder = new CANcoder(encoderPort);
+        turnController = turnMotor.getClosedLoopController();
 
         turnConfig.idleMode(IdleMode.kBrake);
-        turnMotor.configure(turnConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+        turnMotor.configure(turnConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
         ClosedLoopConfig turnControllerConfig = new ClosedLoopConfig();
         turnControllerConfig.pid(0.1, 0, 0);
-        turnController = turnMotor.getClosedLoopController();
         turnControllerConfig.apply(turnControllerConfig);
-        turnMotor.getEncoder().setPosition(absoluteEncoder.getAbsolutePosition().getValueAsDouble());
+
+        turnEncoder.setPosition(absoluteEncoder.getAbsolutePosition().getValueAsDouble());
     }
 
     public void periodic() {
@@ -102,33 +107,17 @@ public class SwerveModule {
      * @return The current angle of the module relative to its zero (radians)
      */
     private double getTurnDistance() {
-        return (absoluteEncoder.getAbsolutePosition().getValueAsDouble()) * 2 * Math.PI;
+        return turnEncoder.getPosition() * 2 * Math.PI;
     }
 
-    /**
-     * @return The current state of the module.
-     */
     public SwerveModuleState getState() {
         return new SwerveModuleState(driveEncoder.getVelocity(), new Rotation2d(getTurnDistance()));
     }
-
-    /**
-     * @return The current position of the module.
-     */
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(getDriveDistance(), new Rotation2d(getTurnDistance()));
     }
-
-    /**
-     * Sets the desired state for the module.
-     *
-     * @param desiredState Desired state with speed and angle.
-     */
     public void setDesiredState(SwerveModuleState desiredState) {
         Rotation2d encoderRotation = new Rotation2d(getTurnDistance());
-
-        SmartDashboard.putNumber(name + " CURRENT ENCODER ANGLE RADIANS", encoderRotation.getRadians());
-         SmartDashboard.putNumber(name + " DESIRED ANGLE RADIANS", desiredState.angle.getRadians());
 
         // Optimize the reference state to avoid spinning further than 90 degrees
         desiredState.optimize(encoderRotation);
@@ -138,13 +127,9 @@ public class SwerveModule {
         // directions. This results in smoother driving.
         // desiredState.cosineScale(encoderRotation);
 
-        // final double turnOutput = turnController.calculate(getTurnDistance(), desiredState.angle.getRadians() + Math.PI );
         turnController.setSetpoint(desiredState.angle.getRotations(), ControlType.kPosition);
-        // SmartDashboard.putNumber(name + " Commanded Delta (Rad)", turnOutput);
-        SmartDashboard.putNumber(name + "driveSpeed", desiredState.speedMetersPerSecond);
 
-        driveMotor.set(desiredState.speedMetersPerSecond);
-        // turnMotor.set(turnOutput);
+        driveMotor.set(desiredState.speedMetersPerSecond / maxSpeedMetersPerSecond);
     }
 
     /**
