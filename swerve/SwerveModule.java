@@ -69,11 +69,14 @@ public class SwerveModule {
         this.wheelDiameterMeters = wheelDiameterMeters;
 
 
+
         driveMotor = new SparkMax(driveMotorPort, MotorType.kBrushless);
         driveEncoder = driveMotor.getEncoder();
 
         driveConfig.idleMode(IdleMode.kBrake);
         driveConfig.inverted(motorReversed);
+        driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
         driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
 
@@ -88,7 +91,6 @@ public class SwerveModule {
         ClosedLoopConfig turnControllerConfig = new ClosedLoopConfig();
         turnControllerConfig.pid(0.1, 0, 0);
         turnControllerConfig.apply(turnControllerConfig);
-        turnMotor.getEncoder().setPosition(absoluteEncoder.getAbsolutePosition().getValueAsDouble());
 
         turnEncoder.setPosition(absoluteEncoder.getAbsolutePosition().getValueAsDouble());
     }

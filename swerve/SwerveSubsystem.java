@@ -2,9 +2,6 @@ package com.robocats.swerve;
 //Maple sim documentation:
 // https://shenzhen-robotics-alliance.github.io/maple-sim/
 
-import static edu.wpi.first.units.Units.KilogramSquareMeters;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Volts;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
