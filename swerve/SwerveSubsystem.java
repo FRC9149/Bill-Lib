@@ -33,9 +33,10 @@ public class SwerveSubsystem extends SubsystemBase {
     private SwerveModule frontRight;
     private SwerveModule backRight;
     private AprilCamera camera;
-
     // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-odometry.html
     SwerveDriveOdometry odometry;
+
+    //Example code
 
 
     /**
