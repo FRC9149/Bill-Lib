@@ -127,7 +127,7 @@ public class SwerveModule {
         // directions. This results in smoother driving.
         // desiredState.cosineScale(encoderRotation);
 
-        turnController.setSetpoint(desiredState.angle.getRotations(), ControlType.kPosition);
+        turnController.setSetpoint(desiredState.angle.getRadians(), ControlType.kPosition);
         SmartDashboard.putNumber(name + "turnSetpoint", desiredState.angle.getRotations());
         SmartDashboard.putNumber(name + "driveSpeed", desiredState.speedMetersPerSecond / maxSpeedMetersPerSecond);
 
