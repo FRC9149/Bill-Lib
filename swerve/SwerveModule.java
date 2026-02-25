@@ -77,9 +77,6 @@ public class SwerveModule {
         driveConfig.inverted(motorReversed);
         driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-
         turnMotor = new SparkMax(turningMotorPort, MotorType.kBrushless);
         turnEncoder = turnMotor.getEncoder();
         absoluteEncoder = new CANcoder(encoderPort);
@@ -88,9 +85,10 @@ public class SwerveModule {
         turnConfig.idleMode(IdleMode.kBrake);
         turnMotor.configure(turnConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
-        ClosedLoopConfig turnControllerConfig = new ClosedLoopConfig();
-        turnControllerConfig.pid(0.1, 0, 0);
-        turnControllerConfig.apply(turnControllerConfig);
+        // ClosedLoopConfig turnControllerConfig = new ClosedLoopConfig();
+        // turnControllerConfig.pid(0.5, 0, 1);
+        // turnControllerConfig.positionWrappingInputRange(0, 1);
+        // turnControllerConfig.apply(turnControllerConfig);
 
         turnEncoder.setPosition(absoluteEncoder.getAbsolutePosition().getValueAsDouble());
     }
@@ -130,7 +128,8 @@ public class SwerveModule {
         // desiredState.cosineScale(encoderRotation);
 
         turnController.setSetpoint(desiredState.angle.getRotations(), ControlType.kPosition);
-        SmartDashboard.putNumber(name + "driveSpeed", desiredState.speedMetersPerSecond);
+        SmartDashboard.putNumber(name + "turnSetpoint", desiredState.angle.getRotations());
+        SmartDashboard.putNumber(name + "driveSpeed", desiredState.speedMetersPerSecond / maxSpeedMetersPerSecond);
 
         driveMotor.set(desiredState.speedMetersPerSecond / maxSpeedMetersPerSecond);
     }
