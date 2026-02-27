@@ -79,6 +79,8 @@ public class SwerveModule {
 
         turnMotor = new SparkMax(turningMotorPort, MotorType.kBrushless);
         turnEncoder = turnMotor.getEncoder();
+        // Waits up to 100ms for a valid position signal from the CAN bus
+    //turnEncoder = turnMotor.getEncoder().waitForUpdate(0.1).getValueAsDouble(); //4EST NOTE: USED TO BE: turnEncoder = turnMotor.getEncoder(); IF IT IS MESSED UP, SWITCH BACK TO THIS
         absoluteEncoder = new CANcoder(encoderPort);
         turnController = turnMotor.getClosedLoopController();
 
