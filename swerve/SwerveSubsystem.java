@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveSubsystem extends SubsystemBase {
     // Controls how fast the robot spins to match a certain heading
-    private PIDController turnController = new PIDController(0.5, 0.0, 0.25);
+    private PIDController turnController = new PIDController(0.2, 0.0, 0.4);
     private RobotConfig robotConfig;
     public final SwerveConfig swerveConfig;
     private SwerveModule frontLeft;
@@ -283,10 +283,10 @@ His name is Jeremy...
      * @param desiredStates The desired SwerveModule states.
      */
     public void setModuleStates(SwerveModuleState[] desiredStates) {          
-        SwerveModuleState fl = desiredStates[2]; //2
-        SwerveModuleState fr = desiredStates[3]; //3
-        SwerveModuleState bl = desiredStates[0]; //0
-        SwerveModuleState br = desiredStates[1]; //1
+        SwerveModuleState fl = desiredStates[0]; //2
+        SwerveModuleState fr = desiredStates[1]; //3
+        SwerveModuleState bl = desiredStates[2]; //0
+        SwerveModuleState br = desiredStates[3]; //1
 
         frontLeft.setDesiredState(fl);
         frontRight.setDesiredState(fr);

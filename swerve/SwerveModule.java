@@ -85,13 +85,18 @@ public class SwerveModule {
         turnController = turnMotor.getClosedLoopController();
 
         turnConfig.idleMode(IdleMode.kBrake);
-        turnMotor.configure(turnConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        turnConfig.encoder.positionConversionFactor(1/21.42857143);
+        turnConfig.encoder.velocityConversionFactor(1);
+        turnConfig.smartCurrentLimit(80, 60);
 
-        // ClosedLoopConfig turnControllerConfig = new ClosedLoopConfig();
-        // turnControllerConfig.pid(0.5, 0, 1);
-        // turnControllerConfig.positionWrappingInputRange(0, 1);
-        // turnControllerConfig.apply(turnControllerConfig);
+        ClosedLoopConfig turnControllerConfig = new ClosedLoopConfig();
+        turnControllerConfig.pid(5, 0, 0.0);
+        turnControllerConfig.positionWrappingInputRange(-1, 1);
+        turnControllerConfig.positionWrappingEnabled(true);
+        turnConfig.closedLoop.apply(turnControllerConfig);
 
+
+        turnMotor.configure(turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         turnEncoder.setPosition(absoluteEncoder.getAbsolutePosition().getValueAsDouble());
     }
 
@@ -127,7 +132,7 @@ public class SwerveModule {
         // Scale speed by cosine of angle error. This scales down movement perpendicular
         // to the desired direction of travel that can occur when modules change
         // directions. This results in smoother driving.
-        // desiredState.cosineScale(encoderRotation);
+        desiredState.cosineScale(encoderRotation);
 
         turnController.setSetpoint(desiredState.angle.getRotations(), ControlType.kPosition);
         SmartDashboard.putNumber(name + "turnSetpoint", desiredState.angle.getRotations());
