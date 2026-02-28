@@ -44,13 +44,10 @@ public class SwerveSubsystem extends SubsystemBase {
      *                      dimensions, max speed, and gyroscope
      * @param pidController temporary test to congifure the pidControllers for the
      *                      turning motors
-     * @param cameraForPose If you are using a camera to detect robot pose, put it
-     *                      in here. If you don't have a camera, input null
      * @param setupPathPlanner Defines if pathplanner should be setup automatically. Otherwise you can call `setupPathPlanner();` yourself
      */
-    public SwerveSubsystem(SwerveConfig config, PIDController test, AprilCamera cameraForPose, boolean setupPathPlanner) {
+    public SwerveSubsystem(SwerveConfig config, PIDController test, boolean setupPathPlanner) {
         swerveConfig = config;
-        camera = cameraForPose;
         turnController = test;
         
         turnController.enableContinuousInput(0, 2 * Math.PI);
@@ -66,6 +63,10 @@ public class SwerveSubsystem extends SubsystemBase {
         if(setupPathPlanner) {
             setupPathPlanner();
         }
+    }
+
+    public void setCamera(AprilCamera camera) {
+        this.camera = camera;
     }
 
     private void initalizeSwerveModules() {
@@ -272,9 +273,12 @@ His name is Jeremy...
             swerveConfig.maxSpeedMetersPerSecond(), 
             1, 
             swerveConfig.maxAngularVelocityRadiansPerSecond(), 
-            1);
+            1
+        );
 
-        return AutoBuilder.pathfindToPose(pose, constraints);
+        Command c = AutoBuilder.pathfindToPose(pose, constraints);
+        c.addRequirements(this);
+        return c;
     }
 
     /**
