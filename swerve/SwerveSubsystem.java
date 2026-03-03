@@ -361,6 +361,15 @@ His name is Jeremy...
                 //secondly, I think i figured it out, but we already have that (it's just written differently)
                 //If you are saying we need to delete the part before "this" and just make it false, then I agree
                 //actually we just need to make isFieldSymmetric false
+
+                //4EST NOTE: I think the fact that is FieldSymmetric is true
+                //means that it's not passing into the math, so yes, as you mentioned,
+                //we should make isFieldSymmetric false, or clarify it
+                //since the field literally is symmetric, but since we are saying it is true,
+                //the code isn't entering that If statement that I believe is neccesary fo the code working.
+
+                //The code below is just another, seemingly smoother way to write it, but it 
+                //didn't do anything at all to change the controls when I tested it.
             
                 //-----------WE SHOULD LOOK INTO THIS------------------,_I_THink_it_may_work_with_some_adjustment,_not_my_code
                 //// Reference to this subsystem to set requirements
