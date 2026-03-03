@@ -351,12 +351,20 @@ His name is Jeremy...
                     // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
                     var alliance = DriverStation.getAlliance();
-                    if (alliance.isPresent() && !swerveConfig.isFieldSymmetric()) {
+                    if (alliance.isPresent() && !swerveConfig.isFieldSymmetric()) {//!swerveConfig.isFieldSymmetric()_is_the_culprit_I_think, I ran out of time to investigate
                         return alliance.get() == DriverStation.Alliance.Red;
                     }
                     return false;
                 },
-                this // Reference to this subsystem to set requirements
+                this
+                //-----------WE SHOULD LOOK INTO THIS------------------,_I_THink_it_may_work_with_some_adjustment,_not_my_code
+                //// Reference to this subsystem to set requirements
+                //robotConfig,
+   // () -> DriverStation.getAlliance()
+        //.map(a -> a == DriverStation.Alliance.Red)
+       // .orElse(false),
+       //         this // Reference to this subsystem to set requirements
+       // );
         );
     }
 }
