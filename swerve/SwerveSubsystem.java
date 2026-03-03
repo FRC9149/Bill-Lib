@@ -271,9 +271,9 @@ His name is Jeremy...
         AutoBuilder.resetOdom(getPose());
         PathConstraints constraints = new PathConstraints(
             swerveConfig.maxSpeedMetersPerSecond(), 
-            1, 
+            0.5,
             swerveConfig.maxAngularVelocityRadiansPerSecond(), 
-            1
+            0.5
         );
 
         Command c = AutoBuilder.pathfindToPose(pose, constraints);
