@@ -357,6 +357,11 @@ His name is Jeremy...
                     return false;
                 },
                 this
+                //First of all, this comment doesn't explain what I am looking at.
+                //secondly, I think i figured it out, but we already have that (it's just written differently)
+                //If you are saying we need to delete the part before "this" and just make it false, then I agree
+                //actually we just need to make isFieldSymmetric false
+            
                 //-----------WE SHOULD LOOK INTO THIS------------------,_I_THink_it_may_work_with_some_adjustment,_not_my_code
                 //// Reference to this subsystem to set requirements
                 //robotConfig,
