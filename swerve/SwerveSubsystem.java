@@ -168,7 +168,7 @@ His name is Jeremy...
         if(camera != null) {
             camera.periodic();
         }
-        m_field.setRobotPose(m_odometry.getPoseMeters());
+        m_field.setRobotPose(getPose());
     }
    
     public Pose2d getPose() {
