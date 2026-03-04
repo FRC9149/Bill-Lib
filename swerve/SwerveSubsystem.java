@@ -42,6 +42,7 @@ public class SwerveSubsystem extends SubsystemBase {
     private SwerveModule frontRight;
     private SwerveModule backRight;
     private AprilCamera camera;
+    private final Field2d m_field;
     // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-odometry.html
     SwerveDriveOdometry odometry;
 
@@ -55,9 +56,10 @@ public class SwerveSubsystem extends SubsystemBase {
      *                      turning motors
      * @param setupPathPlanner Defines if pathplanner should be setup automatically. Otherwise you can call `setupPathPlanner();` yourself
      */
-    public SwerveSubsystem(SwerveConfig config, PIDController test, boolean setupPathPlanner) {
+    public SwerveSubsystem(SwerveConfig config, PIDController test, boolean setupPathPlanner, Field2d field) {
         swerveConfig = config;
         turnController = test;
+        this.m_field = field;
         
         turnController.enableContinuousInput(0,  2*Math.PI);
 
@@ -177,6 +179,7 @@ His name is Jeremy...
         if(camera != null) {
             camera.periodic();
         }
+        m_field.setRobotPose(getPose());
     }
    
     public Pose2d getPose() {
