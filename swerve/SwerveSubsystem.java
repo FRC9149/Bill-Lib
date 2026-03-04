@@ -3,17 +3,24 @@ package com.robocats.swerve;
 // https://shenzhen-robotics-alliance.github.io/maple-sim/
 
 
+import java.util.List;
+
+import javax.xml.crypto.dsig.Transform;
+
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.robocats.vision.AprilCamera;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -21,11 +28,13 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveSubsystem extends SubsystemBase {
     // Controls how fast the robot spins to match a certain heading
     private PIDController turnController = new PIDController(0.2, 0.0, 0.4);
+    private PIDController translationController = new PIDController(0.5, 0, 0);
     private RobotConfig robotConfig;
     public final SwerveConfig swerveConfig;
     private SwerveModule frontLeft;
@@ -50,7 +59,7 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveConfig = config;
         turnController = test;
         
-        turnController.enableContinuousInput(0, 2 * Math.PI);
+        turnController.enableContinuousInput(0,  2*Math.PI);
 
         initalizeSwerveModules();
         try {
@@ -148,6 +157,8 @@ His name is Jeremy...
 */
     @Override
     public void periodic() {
+        
+
         SmartDashboard.putNumber("gyro", getHeading());
         frontLeft.periodic();
         frontRight.periodic();
@@ -179,6 +190,10 @@ His name is Jeremy...
                 backLeft.getState(),
                 backRight.getState()
         });
+    }
+
+    public void resetAutoBuilder() {
+        AutoBuilder.resetOdom(getPose());
     }
 
     /**
@@ -268,7 +283,17 @@ His name is Jeremy...
      * @param pose The position you want to pathfind to
      */
     public Command driveTo(Pose2d pose) {
-        AutoBuilder.resetOdom(getPose());
+        // Pose2d currentPose = getPose();
+        // if(currentPose == null)
+            // return new RunCommand(()->{});
+        // double x = translationController.calculate(currentPose.getX(), pose.getX());
+        // double y = translationController.calculate(currentPose.getY(), pose.getY());
+        // double r = turnController.calculate(currentPose.getRotation().getRadians(), pose.getRotation().getRadians());
+// 
+        // return new RunCommand(()-> this.drive(x, y, r, true), this);
+
+
+        
         PathConstraints constraints = new PathConstraints(
             swerveConfig.maxSpeedMetersPerSecond(), 
             0.5,
@@ -278,7 +303,10 @@ His name is Jeremy...
 
         Command c = AutoBuilder.pathfindToPose(pose, constraints);
         c.addRequirements(this);
-        return c;
+        List<Pose2d> listPose = new List<Pose2d>();
+        listPose.add(pose);
+        PathPlannerPath path = PathPlannerPath.waypointsFromPoses(listPose);
+        return new FollowPathCommand(null, null, null, null, null, robotConfig, null, null)
     }
 
     /**

@@ -42,7 +42,7 @@ public class LimelightCamera implements AprilCamera {
 
 
     public void periodic() {
-        LimelightHelpers.SetIMUMode(cameraName, DriverStation.isEnabled() ? 4 : 0);
+        LimelightHelpers.SetIMUMode(cameraName, DriverStation.isEnabled() ? 0 : 0);
         LimelightHelpers.SetRobotOrientation(cameraName, robotAngle.get().getDegrees(), robotRate.getAsDouble(), 0, 0, 0, 0);
         this.positionEstimation = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName);
 
