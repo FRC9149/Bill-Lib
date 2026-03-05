@@ -3,6 +3,9 @@ package com.robocats.swerve;
 // https://shenzhen-robotics-alliance.github.io/maple-sim/
 
 
+import static edu.wpi.first.units.Units.Rotation;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.crypto.dsig.Transform;
@@ -12,15 +15,20 @@ import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.controllers.PathFollowingController;
+import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPoint;
 import com.robocats.vision.AprilCamera;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -29,13 +37,15 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveSubsystem extends SubsystemBase {
     // Controls how fast the robot spins to match a certain heading
-    private PIDController turnController = new PIDController(0.2, 0.0, 0.4);
-    private PIDController translationController = new PIDController(0.5, 0, 0);
+    private PIDController turnController = new PIDController(0.2, 0.0, 0.05);
+    private PIDController translationController = new PIDController(1, 0, 0.0);
+    private LinearFilter turnFilter = LinearFilter.singlePoleIIR(.01, 0.02);
     private RobotConfig robotConfig;
     public final SwerveConfig swerveConfig;
     private SwerveModule frontLeft;
@@ -57,12 +67,12 @@ public class SwerveSubsystem extends SubsystemBase {
      *                      turning motors
      * @param setupPathPlanner Defines if pathplanner should be setup automatically. Otherwise you can call `setupPathPlanner();` yourself
      */
-    public SwerveSubsystem(SwerveConfig config, PIDController test, boolean setupPathPlanner, Field2d field) {
+    public SwerveSubsystem(SwerveConfig config, boolean setupPathPlanner, Field2d field) {
         swerveConfig = config;
-        turnController = test;
         this.m_field = field;
         
         turnController.enableContinuousInput(0,  2*Math.PI);
+        turnController.setTolerance(Math.PI / 45);
 
         initalizeSwerveModules();
         try {
@@ -161,15 +171,15 @@ His name is Jeremy...
     @Override
     public void periodic() {
         
-
-        SmartDashboard.putNumber("gyro", getHeading());
+        Rotation2d rot = getRotation();
+        SmartDashboard.putNumber("gyro", rot.getRadians());
         frontLeft.periodic();
         frontRight.periodic();
         backLeft.periodic();
         backRight.periodic();
 
         odometry.update(
-                getRotation(),
+                rot,
                 new SwerveModulePosition[] {
                         frontLeft.getPosition(),
                         frontRight.getPosition(),
@@ -273,7 +283,7 @@ His name is Jeremy...
                 ySpeed,
                 xHeading == 0 && yHeading == 0 ? 0 : // so that when you stop pressing the right stick it'll stop
                                                      // spinning
-                        turnController.calculate(getHeading(), headingAngle),
+                        turnController.calculate((turnFilter.calculate(getHeading())), headingAngle),
                 true);
     }
 
@@ -287,31 +297,65 @@ His name is Jeremy...
      * @param pose The position you want to pathfind to
      */
     public Command driveTo(Pose2d pose) {
-        // Pose2d currentPose = getPose();
-        // if(currentPose == null)
-            // return new RunCommand(()->{});
-        // double x = translationController.calculate(currentPose.getX(), pose.getX());
-        // double y = translationController.calculate(currentPose.getY(), pose.getY());
-        // double r = turnController.calculate(currentPose.getRotation().getRadians(), pose.getRotation().getRadians());
-// 
-        // return new RunCommand(()-> this.drive(x, y, r, true), this);
+        return new RunCommand(() -> {
+        Pose2d currentPose = getPose();
+         if (currentPose == null || (currentPose.getX() == 0 && currentPose.getY() == 0)) {
+            System.out.println("currentpose is null");
+            this.drive(0, 0, 0, true);
+            return;
+        }
+         
+        double x = -translationController.calculate(currentPose.getX(), pose.getX());
+        double y = -translationController.calculate(currentPose.getY(), pose.getY());
+        double r = -turnController.calculate(getHeading(), pose.getRotation().getRadians());
 
-
+        this.drive(y, x, r, true);
         
+    }, this).until(() -> {
+        Pose2d currentPose = getPose();
+        if (currentPose == null) return false;
+        
+        boolean xOnTarget = Math.abs(currentPose.getX() - pose.getX()) < 0.05;
+        boolean yOnTarget = Math.abs(currentPose.getY() - pose.getY()) < 0.05;
+        boolean rotOnTarget = Math.abs(getHeading() - pose.getRotation().getRadians()) < 0.05;
+        return xOnTarget && yOnTarget && rotOnTarget;
+    });
+
+/*
+        Pose2d currentPose = getPose();
+        System.out.println(currentPose);
+         if (currentPose == null) {
+            System.out.println("currentpose is null");
+            return new RunCommand(()->System.out.println(currentPose));
+        }
         PathConstraints constraints = new PathConstraints(
-            swerveConfig.maxSpeedMetersPerSecond(), 
-            0.5,
-            swerveConfig.maxAngularVelocityRadiansPerSecond(), 
-            0.5
+           swerveConfig.maxSpeedMetersPerSecond(), 
+           0.5,
+           swerveConfig.maxAngularVelocityRadiansPerSecond(), 
+           0.5
         );
 
-        Command c = AutoBuilder.pathfindToPose(pose, constraints);
-        c.addRequirements(this);
-        // List<Pose2d> listPose = new List<Pose2d>();
-        // listPose.add(pose);
-        // PathPlannerPath path = PathPlannerPath.waypointsFromPoses(listPose);
-        return c;
-        // return new FollowPathCommand(path, this::getPose, null, null, null, robotConfig, null, null);
+        // Command c = AutoBuilder.pathfindToPose(pose, constraints);
+        // c.addRequirements(this);
+        ArrayList<PathPoint> listPose = new ArrayList<PathPoint>();
+        listPose.add(new PathPoint(new Translation2d(currentPose.getX(), currentPose.getY())));
+        listPose.add(new PathPoint(new Translation2d(pose.getX(), pose.getY())));
+        PathPlannerPath path = PathPlannerPath.fromPathPoints(listPose, constraints, new GoalEndState(0, pose.getRotation()));
+    //    return c;
+        return new InstantCommand(()->System.out.println("STARTED"), this).andThen( new FollowPathCommand(
+            path,
+            this::getPose,
+            this::getChassisSpeeds,
+            (speeds, feedforwards) -> drive(speeds, false),
+            new PPHolonomicDriveController(new PIDConstants(0.5, 0, 0), new PIDConstants(0.5, 0, 0)),
+            robotConfig,
+            ()->{var alliance = DriverStation.getAlliance();
+                    if (alliance.isPresent() && !swerveConfig.isFieldSymmetric()) {//!swerveConfig.isFieldSymmetric()_is_the_culprit_I_think, I ran out of time to investigate
+                        return alliance.get() == DriverStation.Alliance.Red;
+                    }
+                    return false;},
+            this
+        ));*/
     }
 
     /**
