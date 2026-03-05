@@ -52,7 +52,7 @@ public class SwerveSubsystem extends SubsystemBase {
     private SwerveModule backLeft;
     private SwerveModule frontRight;
     private SwerveModule backRight;
-    private AprilCamera camera;
+    private ArrayList<AprilCamera> camera;
     private final Field2d m_field;
     // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-odometry.html
     SwerveDriveOdometry odometry;
@@ -87,8 +87,8 @@ public class SwerveSubsystem extends SubsystemBase {
         }
     }
 
-    public void setCamera(AprilCamera camera) {
-        this.camera = camera;
+    public void addCamera(int i, AprilCamera camera) {
+        camera.add(i, camera);
     }
 
     private void initalizeSwerveModules() {
@@ -187,14 +187,23 @@ His name is Jeremy...
                         backRight.getPosition()
                 });
 
-        if(camera != null) {
-            camera.periodic();
+        if(camera.size() > 0) {
+            for(var cam : camera) cam.periodic();
         }
         m_field.setRobotPose(getPose());
     }
    
+    /**
+     * @return the best pose estimate for the robot, goes through the list i=0->∞ until it finds a pose that works, otherwises uses wheel odometry.
+     */
     public Pose2d getPose() {
-        return camera != null ? camera.getRobotPose() : odometry.getPoseMeters();
+        for(var cam : camera) {
+            if(cam == null) continue;
+            Pose2d pose = cam.getRobotPose();
+            if(pose == null || (pose.getX() == 0 && pose.getY() == 0)) continue;
+            return pose;
+        }
+        return odometry.getPoseMeters();
     }
 
     public ChassisSpeeds getChassisSpeeds() {
