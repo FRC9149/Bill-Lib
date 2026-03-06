@@ -73,4 +73,8 @@ public class LimelightCamera implements AprilCamera {
     public void screenshot() {
         LimelightHelpers.takeSnapshot(cameraName, cameraName + "_snapshot");
     }
+
+    public boolean hasTargets() {
+    return LimelightHelpers.getTV(cameraName);
+}
 }
