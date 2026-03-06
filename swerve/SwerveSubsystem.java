@@ -197,6 +197,11 @@ His name is Jeremy...
         if(camera.size() > 0) {
             for(var cam : camera) cam.periodic();
         }
+        
+        SmartDashboard.putNumber("PoseX", getPose().getX());
+        
+        SmartDashboard.putNumber("PoseY", getPose().getY());
+        
         m_field.setRobotPose(getPose());
     }
    

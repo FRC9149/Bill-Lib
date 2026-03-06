@@ -46,10 +46,7 @@ public class LimelightCamera implements AprilCamera {
         LimelightHelpers.SetRobotOrientation(cameraName, robotAngle.get().getDegrees(), robotRate.getAsDouble(), 0, 0, 0, 0);
         this.positionEstimation = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName);
 
-        if(getRobotPose() != null) {
-            SmartDashboard.putNumber("PoseX", getRobotPose().getMeasureX().in(Meters));
-            SmartDashboard.putNumber("PoseY", getRobotPose().getMeasureY().in(Meters));
-        }
+        
     }
 
     public Pose2d getRobotPose() {
