@@ -47,5 +47,8 @@ public class PhotonVisionCamera implements AprilCamera {
     public void periodic() {
         pipelineResults = camera.getAllUnreadResults();
     }
-    
+    public boolean hasTargets() {
+        //FIX THIS IF YOU NEED THIS
+        return false;
+    }
 }

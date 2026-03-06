@@ -12,6 +12,15 @@ import edu.wpi.first.math.util.Units;
  */
 public interface AprilCamera {
   final PIDController faceTagController = new PIDController(0.5, 0.01, 0.01);
+
+
+
+    
+
+    public boolean hasTargets();
+
+
+
   /**
    * @return The estimated position of the robot on the field.
    */

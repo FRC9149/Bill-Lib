@@ -202,7 +202,7 @@ His name is Jeremy...
    
     /**
      * @return the best pose estimate for the robot, goes through the list i=0->∞ until it finds a pose that works, otherwises uses wheel odometry.
-     */
+     */ 
     public Pose2d getPose() {
         for(var cam : camera) {
             if(cam == null) continue;
@@ -465,7 +465,7 @@ His name is Jeremy...
                 //The code below is just another, seemingly smoother way to write it, but it 
                 //didn't do anything at all to change the controls when I tested it.
             
-                //-----------WE SHOULD LOOK INTO THIS------------------,_I_THink_it_may_work_with_some_adjustment,_not_my_code
+                //----o        ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooouu-------WE SHOULD LOOK INTO THIS------------------,_I_THink_it_may_work_with_some_adjustment,_not_my_code
                 //// Reference to this subsystem to set requirements
                 //robotConfig,
    // () -> DriverStation.getAlliance()
