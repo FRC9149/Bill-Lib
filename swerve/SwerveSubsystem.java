@@ -211,7 +211,6 @@ His name is Jeremy...
     public Pose2d getPose() {
         for(var cam : camera) {
             if(cam == null) continue;
-            if(!cam.hasTargets()) continue;
             Pose2d pose = cam.getRobotPose();
             if(pose == null || (pose.getX() == 0 && pose.getY() == 0)) continue;
             return pose;
