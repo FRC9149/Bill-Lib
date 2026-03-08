@@ -43,9 +43,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveSubsystem extends SubsystemBase {
     // Controls how fast the robot spins to match a certain heading
-    private PIDController turnController = new PIDController(0.2, 0.0, 0.05);
+    private PIDController turnController = new PIDController(0.2, 0.0, 0);
     private PIDController translationController = new PIDController(1, 0, 0.0);
-    private LinearFilter turnFilter = LinearFilter.singlePoleIIR(.01, 0.02);
+    private LinearFilter turnFilter = LinearFilter.singlePoleIIR(0.5, 0.02);
     private RobotConfig robotConfig;
     public final SwerveConfig swerveConfig;
     private SwerveModule frontLeft;
@@ -215,7 +215,7 @@ His name is Jeremy...
             if(pose == null || (pose.getX() == 0 && pose.getY() == 0)) continue;
             return pose;
         }
-        return odometry.getPoseMeters();
+        return odometry.getPoseMeters() != null ? odometry.getPoseMeters() : new Pose2d(0, 0, new Rotation2d(0));
     }
 
     public ChassisSpeeds getChassisSpeeds() {
