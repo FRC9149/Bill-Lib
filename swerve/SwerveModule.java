@@ -1,6 +1,7 @@
 package com.robocats.swerve;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -32,10 +33,12 @@ public class SwerveModule {
     private final SparkMax driveMotor; // rotates the wheel to make it spin
     private final RelativeEncoder driveEncoder;
     private SparkMaxConfig driveConfig = new SparkMaxConfig();
+    // private SlewRateLimiter rateLimiter = new SlewRateLimiter(1.5);
 
     private final SparkMax turnMotor; // rotates the wheel to change direction
     private final CANcoder absoluteEncoder;
     private final SparkClosedLoopController turnController;
+    // private final PIDController driveController = new PIDController(0.3, 0, 0.001);
     private final RelativeEncoder turnEncoder;
     private SparkMaxConfig turnConfig = new SparkMaxConfig();
 
@@ -75,6 +78,8 @@ public class SwerveModule {
 
         driveConfig.idleMode(IdleMode.kBrake);
         driveConfig.inverted(motorReversed);
+        driveConfig.smartCurrentLimit(40, 40);
+        driveConfig.closedLoopRampRate(.01);
         driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         turnMotor = new SparkMax(turningMotorPort, MotorType.kBrushless);
@@ -87,7 +92,7 @@ public class SwerveModule {
         turnConfig.idleMode(IdleMode.kBrake);
         turnConfig.encoder.positionConversionFactor(1/21.42857143);
         turnConfig.encoder.velocityConversionFactor(1);
-        turnConfig.smartCurrentLimit(80, 60);
+        turnConfig.smartCurrentLimit(40, 40);
 
         ClosedLoopConfig turnControllerConfig = new ClosedLoopConfig();
         turnControllerConfig.pid(5, 0, 0.0);
@@ -109,6 +114,10 @@ public class SwerveModule {
      */
     private double getDriveDistance() {
         return driveEncoder.getPosition() * (Math.PI * Math.pow(wheelDiameterMeters / 2, 2));
+    }
+
+    private double getSpeed() {
+        return driveEncoder.getVelocity() / 60 * wheelDiameterMeters;
     }
 
     /**
@@ -138,7 +147,7 @@ public class SwerveModule {
         SmartDashboard.putNumber(name + "turnSetpoint", desiredState.angle.getRotations());
         SmartDashboard.putNumber(name + "driveSpeed", desiredState.speedMetersPerSecond / maxSpeedMetersPerSecond);
 
-        driveMotor.set(desiredState.speedMetersPerSecond / maxSpeedMetersPerSecond);
+        driveMotor.set((desiredState.speedMetersPerSecond / maxSpeedMetersPerSecond));
     }
 
     /**
