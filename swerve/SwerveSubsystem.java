@@ -249,6 +249,22 @@ His name is Jeremy...
     }
 
     /**
+     * Locks the swervedrive so that it's harder to move. Makes in X shape with the wheels
+     */
+    public void lock() {
+        SwerveModuleState[] states = { 
+            new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+            new SwerveModuleState(0, Rotation2d.fromDegrees(-135)),
+            new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+            new SwerveModuleState(0, Rotation2d.fromDegrees(135)),
+        };
+        //TODO test to see if having the motors drive at a small speed would help lock the wheels more
+        //an extremely little amount of power (like 0.1)
+
+        setModuleStates(states);
+    }
+
+    /**
      * Method to drive the robot using joystick info.
      *
      * @param xSpeed        Speed of the robot in the x direction (forward) (between
