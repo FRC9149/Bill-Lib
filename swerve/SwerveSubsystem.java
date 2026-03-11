@@ -43,9 +43,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveSubsystem extends SubsystemBase {
     // Controls how fast the robot spins to match a certain heading
-    private PIDController turnController = new PIDController(0.2, 0.0, 0);
+    private PIDController turnController = new PIDController(0.1, 0.0, 0.00000);
     private PIDController translationController = new PIDController(1, 0, 0.0);
-    private LinearFilter turnFilter = LinearFilter.singlePoleIIR(0.5, 0.02);
+    private LinearFilter turnFilter = LinearFilter.singlePoleIIR(0.1, 0.02);
     private RobotConfig robotConfig;
     public final SwerveConfig swerveConfig;
     private SwerveModule frontLeft;
@@ -56,8 +56,6 @@ public class SwerveSubsystem extends SubsystemBase {
     private final Field2d m_field;
     // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-odometry.html
     SwerveDriveOdometry odometry;
-
-    //Example code
 
 
     /**
@@ -314,13 +312,14 @@ His name is Jeremy...
 
     public void drive(double xSpeed, double ySpeed, double xHeading, double yHeading) {
         double headingAngle = Math.atan2(yHeading, xHeading) + Math.PI; // in radians
-
+        double turn = turnFilter.calculate(getHeading());
+        SmartDashboard.putNumber("Updated Gyro", turn);
         drive(
                 xSpeed,
                 ySpeed,
                 xHeading == 0 && yHeading == 0 ? 0 : // so that when you stop pressing the right stick it'll stop
                                                      // spinning
-                        turnController.calculate((turnFilter.calculate(getHeading())), headingAngle),
+                        turnController.calculate(turn, headingAngle),
                 true);
     }
 
@@ -454,8 +453,8 @@ His name is Jeremy...
                 new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for
                                                 // holonomic drive trains
 //TODO figure out what these pid controllers do and configure them
-                        new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-                        new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+                        new PIDConstants(translationController.getP(), translationController.getI(), translationController.getD()), // Translation PID constants
+                        new PIDConstants(turnController.getP(), turnController.getI(), turnController.getD()) // Rotation PID constants
                 ),
                 robotConfig, // The robot configuration
                 () -> {
