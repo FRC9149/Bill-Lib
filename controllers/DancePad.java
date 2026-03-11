@@ -3,18 +3,18 @@ package com.robocats.controllers;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-/** <p>A class that allows for input with a DDR controller</p>
+/** <p>A class that allows for input with a DancePad</p>
  * <a href="https://www.amazon.com/YtotY-Dancing-Controller-Fitness-Building/dp/B0D7JLQ5F3/ref=sr_1_1_sspa?crid=15CNVFJ4696VF&dib=eyJ2IjoiMSJ9.yN8-2aycoSmPBkqCMkmmuw9h4iztoJHV1An5-wXCpONUXwywjgVuIap96OqADIVT2RubsZ115H_NWCY8MPXjBafYzB9TVUzwwPofR6N88gI58Em3dvoT-GCI46HTo5cJt5M1XputcQYE2biKKmQlhAICC7MWbcFiPxlzxTLHm7sa8fQUDTm413GYPLqUTmEZFnIqg3uEcHusjPGoli-1DfCC9ENmpMMjknWEj8WRff0.7KC0BrPsT6eCqVX4nXqTjFdCHfqAMf8Z7SdeFaqpfL8&dib_tag=se&keywords=dance+pad+pc&qid=1737413280&sprefix=dance+pad+pc%2Caps%2C176&sr=8-1-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1">
  * Link to Amazon product</a>
  * @author El Campus
  */
-public class DDR {
+public class DancePad {
     private Joystick gamepad;
 
     /** 
      * @param gamepadPort The port that the controller is on
      */
-    public DDR(int gamepadPort) {
+    public DancePad(int gamepadPort) {
         gamepad = new Joystick(gamepadPort);
     }
 
