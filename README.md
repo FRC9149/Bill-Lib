@@ -1,5 +1,5 @@
 # Installing the library 
-`git submodule add https://github.com/FRC9149/Bill-Lib.git src/main/java/Bill-lib -b main`\
+`git submodule add https://github.com/FRC9149/Bill-Lib.git src/main/java/com/robocats`\
 Installs the the library in the src/main/java/Bill-lib directory on the main branch.\
 ![using the command](ReadmeFiles/install.gif)
 
