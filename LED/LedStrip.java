@@ -356,7 +356,7 @@ public class LedStrip extends SubsystemBase {
 
 
     public void Prettycolors() {
-        LEDPattern pattern = scroll(make_breathing_gradient(9.0, COLOR(127,255,0, 75, 83, 32)), 11.786);
+        LEDPattern pattern = blinking(3.78654321, scroll(make_breathing_gradient(9.0, COLOR(127,255,0, 75, 83, 32)), 11.786));
         applyLEDPattern(pattern);
 
     }
