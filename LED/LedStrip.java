@@ -194,7 +194,7 @@ public class LedStrip extends SubsystemBase {
     /** stops output to the led strip*/
     public void stop() { led.stop();}
 
-    public void setAll(int r, int g, int b) {
+    public LEDPattern setAll(int r, int g, int b) {
 
         for (int index = 0; index < ledBuffer.getLength(); index++) {
             ledBuffer.setRGB(index, r, g, b);
@@ -245,6 +245,14 @@ public class LedStrip extends SubsystemBase {
         return applyBrightness(pattern);
     }
 
+    public LEDPattern blinking(double breathingTime, LEDPattern base) {
+
+        LEDPattern pattern =  base.blink(Seconds.of(breathingTime));
+
+        return applyBrightness(pattern);
+
+    }
+
     //ASYMMETRICAL:
     public LEDPattern make_blinking_gradient(double ON, double OFF, Color... colors){
         // Create an LED pattern that displays a red-to-blue gradient, breathing at a 2 second period (0.5 Hz)
@@ -253,6 +261,14 @@ public class LedStrip extends SubsystemBase {
 
         return applyBrightness(pattern);
 
+
+    }
+
+    public LEDPattern blinking(double ON, double OFF, LEDPattern base) {
+
+        LEDPattern pattern =  base.blink(Seconds.of(ON), Seconds.of(OFF));
+        
+        return applyBrightness(pattern);
 
     }
 
@@ -265,6 +281,13 @@ public class LedStrip extends SubsystemBase {
 
         return applyBrightness(pattern);
 
+    }
+
+    public LEDPattern blinking(BooleanSupplier THE_TRUTH, LEDPattern base) {
+
+        LEDPattern pattern =  base.synchronizedBlink(THE_TRUTH);
+        
+        return applyBrightness(pattern);
 
     }
 
@@ -278,6 +301,16 @@ public class LedStrip extends SubsystemBase {
         return applyBrightness(pattern);
 
     }
+
+    public LEDPattern breathing(double breathingTime, LEDPattern base) {
+
+        LEDPattern pattern =  base.breathe(Seconds.of(breathingTime));
+
+        return applyBrightness(pattern);
+
+    }
+
+
 
     public void setLoading() {}
 
