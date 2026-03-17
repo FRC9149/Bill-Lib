@@ -203,7 +203,7 @@ public class LedStrip extends SubsystemBase {
     /** stops output to the led strip*/
     public void stop() { led.stop();}
 
-    public LEDPattern setAll(int r, int g, int b) {
+    public void setAll(int r, int g, int b) {
 
         for (int index = 0; index < ledBuffer.getLength(); index++) {
             ledBuffer.setRGB(index, r, g, b);
@@ -328,4 +328,37 @@ public class LedStrip extends SubsystemBase {
         LEDPattern pattern = LEDPattern.steps(Map.of(0, color_one, 0.5, color_two));
         return applyBrightness(pattern);
     }
+
+    
+//============================================================================================================
+//=======================MACROS=========================================================================
+//============================================================================================
+/*
+*                           
+*                          .' `'.__
+*                         /      \ `'"-,
+*        .-''''--...__..-/ .     |      \
+*      .'               ; :'     '.  ʘ   |
+*     /                 | :.       \     =\
+*    ;                   \':.      /  ,-.__;.-;`
+*   /|     .              '--._   /-.7`._..-;`
+*  ; |       '                |`-'      \  =|
+*  |/\        .   -' /     /  ;         |  =z/
+*  (( ;.       ,_  .:|     | /     /\   | =|
+*   ) / `\     | `""`;     / |    | /   / =/
+*     | ::|    |      \    \ \    \ `--' =/
+*    /  '/\    /       )    |/     `-...-`
+*   /    | |  `\    /-'    /;
+*   \  nn/ |    \   D    .'  \
+*    `""`   \  nnh  D_.-'L__nnh
+*            `"""`
+*/
+
+
+    public void Prettycolors() {
+        LEDPattern pattern = scroll(make_breathing_gradient(9.0, COLOR(127,255,0, 75, 83, 32)), 11.786);
+        applyLEDPattern(pattern);
+
+    }
+
 }
