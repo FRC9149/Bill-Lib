@@ -254,9 +254,9 @@ public class LedStrip extends SubsystemBase {
         return applyBrightness(pattern);
     }
 
-    public LEDPattern blinking(double breathingTime, LEDPattern base) {
+    public LEDPattern blinking(double blinkingTime, LEDPattern base) {
 
-        LEDPattern pattern =  base.blink(Seconds.of(breathingTime));
+        LEDPattern pattern =  base.blink(Seconds.of(blinkingTime));
 
         return applyBrightness(pattern);
 
@@ -343,7 +343,7 @@ public class LedStrip extends SubsystemBase {
 *    ;                   \':.      /  ,-.__;.-;`
 *   /|     .              '--._   /-.7`._..-;`
 *  ; |       '                |`-'      \  =|
-*  |/\        .   -' /     /  ;         |  =z/
+*  |/\        .   -' /     /  ;         |  =/
 *  (( ;.       ,_  .:|     | /     /\   | =|
 *   ) / `\     | `""`;     / |    | /   / =/
 *     | ::|    |      \    \ \    \ `--' =/
