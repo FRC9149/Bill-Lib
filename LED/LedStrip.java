@@ -180,6 +180,15 @@ public class LedStrip extends SubsystemBase {
         pattern.applyTo(ledBuffer);
         led.setData(ledBuffer);
     }
+    //// EX This makes an LED pattern that scrolls a gradient at 10.5 percent of the strip per second
+    //subsystem.applyLEDPattern(
+    //    subsystem.scroll(
+    //    subsystem.make_gradient(
+    //        subsystem.COLOR(237, 100, 195)
+    //    ), 
+    //    10.5
+    //    )
+    //);
 
     //Not for use outside of here I think
     private LEDPattern applyBrightness(LEDPattern pattern) {
