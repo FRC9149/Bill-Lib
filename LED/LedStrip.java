@@ -368,15 +368,12 @@ public class LedStrip extends SubsystemBase {
     }
     public void BoringSolidColorsNavy() {
         setAll(0,0,128);
-        led.setData(ledBuffer);
     }
     public void BoringSolidColorsVermilion() {
         setAll(227,66,52);
-        led.setData(ledBuffer);
     }
     public void BoringSolidColorsIvyGreen() {
         setAll(0,106,91);
-        led.setData(ledBuffer);
     }
 
 }
