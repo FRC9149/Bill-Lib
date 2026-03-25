@@ -336,24 +336,24 @@ public class LedStrip extends SubsystemBase {
 
 
 /*
-*                           
-*                          .' `'.__
-*                         /      \ `'"-,
-*        .-''''--...__..-/ .     |      \
-*      .'               ; :'     '.  ʘ   |
-*     /                 | :.       \     =\
-*    ;                   \':.      /  ,-.__;.-;`
-*   /|     .              '--._   /-.7`._..-;`
-*  ; |       '                |`-'      \  =|
-*  |/\        .   -' /     /  ;         |  =/
-*  (( ;.       ,_  .:|     | /     /\   | =|
-*   ) / `\     | `""`;     / |    | /   / =/
-*     | ::|    |      \    \ \    \ `--' =/
-*    /  '/\    /       )    |/     `-...-`
-*   /    | |  `\    /-'    /;
-*   \  nn/ |    \   D    .'  \
-*    `""`   \  nnh  D_.-'L__nnh
-*            `"""`
+                           
+                          .' `'.__
+                         /      \ `'"-,
+        .-''''--...__..-/ .     |      \
+      .'               ; :'     '.  ʘ   |
+     /                 | :.       \     =\
+    ;                   \':.      /  ,-.__;.-;`
+   /|     .              '--._   /-.7`._..-;`
+  ; |       '                |`-'      \  =|
+  |/\        .   -' /     /  ;         |  =/
+  (( ;.       ,_  .:|     | /     /\   | =|
+   ) / `\     | `""`;     / |    | /   / =/
+     | ::|    |      \    \ \    \ `--' =/
+    /  '/\    /       )    |/     `-...-`
+   /    | |  `\    /-'    /;
+   \  nn/ |    \   D    .'  \
+    `""`   \  nnh  D_.-'L__nnh
+            `"""`
 */
 
 
@@ -361,6 +361,22 @@ public class LedStrip extends SubsystemBase {
         LEDPattern pattern = blinking(3.78654321, scroll(make_breathing_gradient(9.0, COLOR(127,255,0, 75, 83, 32)), 11.786));
         applyLEDPattern(pattern);
 
+    }
+    public void Flash() {
+        LEDPattern pattern = make_blinking_gradient(.1, COLOR(255,255,255));
+        applyLEDPattern(pattern);
+    }
+    public void BoringSolidColorsNavy() {
+        setAll(0,0,128);
+        led.setData(ledBuffer);
+    }
+    public void BoringSolidColorsVermilion() {
+        setAll(227,66,52);
+        led.setData(ledBuffer);
+    }
+    public void BoringSolidColorsIvyGreen() {
+        setAll(0,106,91);
+        led.setData(ledBuffer);
     }
 
 }
