@@ -21,8 +21,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class LimelightCamera implements AprilCamera {
+public class LimelightCamera extends SubsystemBase implements AprilCamera {
     private PoseEstimate positionEstimation;
     private String cameraName;
     private Supplier<Rotation2d> robotAngle;
@@ -45,8 +46,6 @@ public class LimelightCamera implements AprilCamera {
         LimelightHelpers.SetIMUMode(cameraName, DriverStation.isEnabled() ? 0 : 0);
         LimelightHelpers.SetRobotOrientation(cameraName, robotAngle.get().getDegrees(), robotRate.getAsDouble(), 0, 0, 0, 0);
         this.positionEstimation = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName);
-
-        
     }
 
     public Pose2d getRobotPose() {

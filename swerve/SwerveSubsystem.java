@@ -30,6 +30,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -43,8 +44,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveSubsystem extends SubsystemBase {
     // Controls how fast the robot spins to match a certain heading
-    private PIDController turnController = new PIDController(0.1, 0.0, 0.00000);
-    private PIDController translationController = new PIDController(1, 0, 0.0);
+    private PIDController turnController = new PIDController(0.5, 0.0, 0);
+    private PIDController translationController = new PIDController(5, 0, 0.0);
     private LinearFilter turnFilter = LinearFilter.singlePoleIIR(0.1, 0.02);
     private RobotConfig robotConfig;
     public final SwerveConfig swerveConfig;
@@ -69,8 +70,8 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveConfig = config;
         this.m_field = field;
         
-        turnController.enableContinuousInput(0,  2*Math.PI);
-        turnController.setTolerance(Math.PI / 45);
+        turnController.enableContinuousInput(-Math.PI,  Math.PI);//was 0, 2*PI
+        turnController.setTolerance(Math.PI / 15);
 
         initalizeSwerveModules();
         try {
@@ -175,7 +176,6 @@ His name is Jeremy...
 */
     @Override
     public void periodic() {
-        
         Rotation2d rot = getRotation();
         SmartDashboard.putNumber("gyro", rot.getRadians());
         frontLeft.periodic();
@@ -192,9 +192,9 @@ His name is Jeremy...
                         backRight.getPosition()
                 });
 
-        if(camera.size() > 0) {
-            for(var cam : camera) cam.periodic();
-        }
+        // if(camera.size() > 0) {
+            // for(var cam : camera) cam.periodic();
+        // }
         
         SmartDashboard.putNumber("PoseX", getPose().getX());
         
@@ -207,13 +207,13 @@ His name is Jeremy...
      * @return the best pose estimate for the robot, goes through the list i=0->∞ until it finds a pose that works, otherwises uses wheel odometry.
      */ 
     public Pose2d getPose() {
-        for(var cam : camera) {
-            if(cam == null) continue;
-            Pose2d pose = cam.getRobotPose();
-            if(pose == null || (pose.getX() == 0 && pose.getY() == 0)) continue;
-            return pose;
-        }
-        return odometry.getPoseMeters() != null ? odometry.getPoseMeters() : new Pose2d(0, 0, new Rotation2d(0));
+        // for(var cam : camera) {
+            // if(cam == null) continue;
+            // Pose2d pose = cam.getRobotPose();
+            // if(pose == null || (pose.getX() == 0 && pose.getY() == 0)) continue;
+            // return pose;
+        // }
+        return odometry.getPoseMeters(); //!= null ? odometry.getPoseMeters() : new Pose2d(0, 0, new Rotation2d(0));
     }
 
     public ChassisSpeeds getChassisSpeeds() {
@@ -283,10 +283,6 @@ His name is Jeremy...
         //clamp the rotation between -1 and 1
         rot = MathUtil.clamp(rot, -1, 1);
 
-        // apply the max speeds
-        xSpeed *= swerveConfig.maxSpeedMetersPerSecond();
-        ySpeed *= swerveConfig.maxSpeedMetersPerSecond();
-        rot *= swerveConfig.maxAngularVelocityRadiansPerSecond();
 
         SmartDashboard.putNumber("DriveX", xSpeed);
         SmartDashboard.putNumber("DriveY", ySpeed);
@@ -301,9 +297,21 @@ His name is Jeremy...
             rotatedY = Math.sin(robotAngle) * xSpeed + ySpeed * Math.cos(robotAngle);
             //rotate the drive inputs based on the robot angle
         }
+        
+        // apply the max speeds
+        rotatedX *= swerveConfig.maxSpeedMetersPerSecond();
+        rotatedY *= swerveConfig.maxSpeedMetersPerSecond();
+        rot *= swerveConfig.maxAngularVelocityRadiansPerSecond();
 
         SwerveModuleState[] swerveModuleStates = swerveConfig.driveKinematics().toSwerveModuleStates(
             new ChassisSpeeds(rotatedX, rotatedY, rot)
+        );
+
+        // SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, swerveConfig.maxSpeedMetersPerSecond());
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, new ChassisSpeeds(rotatedX, rotatedY, rot), 
+            swerveConfig.maxSpeedMetersPerSecond(), 
+            swerveConfig.maxSpeedMetersPerSecond(), 
+            swerveConfig.maxAngularVelocityRadiansPerSecond()
         );
 
         setModuleStates(swerveModuleStates);        
@@ -313,13 +321,13 @@ His name is Jeremy...
     public void drive(double xSpeed, double ySpeed, double xHeading, double yHeading) {
         double headingAngle = Math.atan2(yHeading, xHeading) + Math.PI; // in radians
         double turn = turnFilter.calculate(getHeading());
-        SmartDashboard.putNumber("Updated Gyro", turn);
+        SmartDashboard.putNumber("Updated Gyro", turn); //use turn rather than getheading for the filter
         drive(
                 xSpeed,
                 ySpeed,
                 xHeading == 0 && yHeading == 0 ? 0 : // so that when you stop pressing the right stick it'll stop
                                                      // spinning
-                        turnController.calculate(turn, headingAngle),
+                        turnController.calculate(turn*100, headingAngle*100), //use turn rather than getheading for the filter
                 true);
     }
 
@@ -447,7 +455,7 @@ His name is Jeremy...
                 this::getPose, // Robot pose supplier
                 this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
                 this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                (speeds, feedforwards) -> drive(speeds, false), // Method that will drive the robot given ROBOT RELATIVE
+                (speeds, feedforwards) -> drive(new ChassisSpeeds(-speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, -speeds.omegaRadiansPerSecond), false), // Method that will drive the robot given ROBOT RELATIVE
                                                                 // ChassisSpeeds. Also optionally outputs individual
                                                                 // module feedforwards
                 new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for

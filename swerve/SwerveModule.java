@@ -1,5 +1,6 @@
 package com.robocats.swerve;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -33,11 +34,13 @@ public class SwerveModule {
     private final SparkMax driveMotor; // rotates the wheel to make it spin
     private final RelativeEncoder driveEncoder;
     private SparkMaxConfig driveConfig = new SparkMaxConfig();
+    private final SparkClosedLoopController driveController;
     // private SlewRateLimiter rateLimiter = new SlewRateLimiter(1.5);
 
     private final SparkMax turnMotor; // rotates the wheel to change direction
     private final CANcoder absoluteEncoder;
     private final SparkClosedLoopController turnController;
+ 
     // private final PIDController driveController = new PIDController(0.3, 0, 0.001);
     private final RelativeEncoder turnEncoder;
     private SparkMaxConfig turnConfig = new SparkMaxConfig();
@@ -70,16 +73,26 @@ public class SwerveModule {
         this.name = name;
         this.maxSpeedMetersPerSecond = maxSpeedMetersPerSecond;
         this.wheelDiameterMeters = wheelDiameterMeters;
-
+        
 
 
         driveMotor = new SparkMax(driveMotorPort, MotorType.kBrushless);
         driveEncoder = driveMotor.getEncoder();
+        driveController = driveMotor.getClosedLoopController();
+     
+   
 
         driveConfig.idleMode(IdleMode.kBrake);
+        
         driveConfig.inverted(motorReversed);
         driveConfig.smartCurrentLimit(40, 40);
         driveConfig.closedLoopRampRate(.01);
+
+        //ClosedLoopConfig driveControllerConfig = new ClosedLoopConfig();
+        //driveControllerConfig.pid(0.0025, 0, 1);
+//
+        //driveConfig.closedLoop.apply(driveControllerConfig);
+
         driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         turnMotor = new SparkMax(turningMotorPort, MotorType.kBrushless);
@@ -95,7 +108,7 @@ public class SwerveModule {
         turnConfig.smartCurrentLimit(40, 40);
 
         ClosedLoopConfig turnControllerConfig = new ClosedLoopConfig();
-        turnControllerConfig.pid(5, 0, 0.0);
+        turnControllerConfig.pid(0.5, 0, 0); //was 5, 0, 0
         turnControllerConfig.positionWrappingInputRange(-1, 1);
         turnControllerConfig.positionWrappingEnabled(true);
         turnConfig.closedLoop.apply(turnControllerConfig);
@@ -147,7 +160,11 @@ public class SwerveModule {
         SmartDashboard.putNumber(name + "turnSetpoint", desiredState.angle.getRotations());
         SmartDashboard.putNumber(name + "driveSpeed", desiredState.speedMetersPerSecond / maxSpeedMetersPerSecond);
 
-        driveMotor.set((desiredState.speedMetersPerSecond / maxSpeedMetersPerSecond));
+         driveMotor.set(desiredState.speedMetersPerSecond / maxSpeedMetersPerSecond);
+       // double speed = MathUtil.clamp(desiredState.speedMetersPerSecond, -1, 1);
+        
+        //driveController.setSetpoint(speed * 12, ControlType.kVelocity);
+
     }
 
     /**
