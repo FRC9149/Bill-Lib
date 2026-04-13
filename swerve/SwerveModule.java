@@ -85,13 +85,8 @@ public class SwerveModule {
         driveConfig.idleMode(IdleMode.kBrake);
         
         driveConfig.inverted(motorReversed);
-        driveConfig.smartCurrentLimit(40, 40);
-        driveConfig.closedLoopRampRate(.01);
-
-        //ClosedLoopConfig driveControllerConfig = new ClosedLoopConfig();
-        //driveControllerConfig.pid(0.0025, 0, 1);
-//
-        //driveConfig.closedLoop.apply(driveControllerConfig);
+        driveConfig.smartCurrentLimit(80, 80);
+        driveConfig.closedLoopRampRate(0.1);
 
         driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -105,11 +100,11 @@ public class SwerveModule {
         turnConfig.idleMode(IdleMode.kBrake);
         turnConfig.encoder.positionConversionFactor(1/21.42857143);
         turnConfig.encoder.velocityConversionFactor(1);
-        turnConfig.smartCurrentLimit(40, 40);
+        turnConfig.smartCurrentLimit(80, 80);
 
         ClosedLoopConfig turnControllerConfig = new ClosedLoopConfig();
-        turnControllerConfig.pid(0.5, 0, 0); //was 5, 0, 0
-        turnControllerConfig.positionWrappingInputRange(-1, 1);
+        turnControllerConfig.pid(0.5, 0, 0.1);
+        turnControllerConfig.positionWrappingInputRange(-0.75, 0.75);
         turnControllerConfig.positionWrappingEnabled(true);
         turnConfig.closedLoop.apply(turnControllerConfig);
 
@@ -119,14 +114,14 @@ public class SwerveModule {
     }
 
     public void periodic() {
-        SmartDashboard.putNumber(name + " turn encoder", getTurnDistance());
+        // SmartDashboard.putNumber(name + " turn encoder", getTurnDistance());
     }
 
     /**
      * @return The distance that the module has driven since reset (meters)
      */
     private double getDriveDistance() {
-        return driveEncoder.getPosition() * (Math.PI * Math.pow(wheelDiameterMeters / 2, 2));
+        return driveEncoder.getPosition() * (Math.PI * wheelDiameterMeters); // WAS return driveEncoder.getPosition() * (Math.PI * Math.pow(wheelDiameterMeters / 2, 2));
     }
 
     private double getSpeed() {
@@ -141,7 +136,7 @@ public class SwerveModule {
     }
 
     public SwerveModuleState getState() {
-        return new SwerveModuleState(driveEncoder.getVelocity(), new Rotation2d(getTurnDistance()));
+        return new SwerveModuleState(getSpeed(), Rotation2d.fromRadians(getTurnDistance()));
     }
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(getDriveDistance(), new Rotation2d(getTurnDistance()));
@@ -157,14 +152,12 @@ public class SwerveModule {
         desiredState.cosineScale(encoderRotation);
 
         turnController.setSetpoint(desiredState.angle.getRotations(), ControlType.kPosition);
-        SmartDashboard.putNumber(name + "turnSetpoint", desiredState.angle.getRotations());
+        // SmartDashboard.putNumber(name + "turnSetpoint", desiredState.angle.getRotations());
         SmartDashboard.putNumber(name + "driveSpeed", desiredState.speedMetersPerSecond / maxSpeedMetersPerSecond);
 
-         driveMotor.set(desiredState.speedMetersPerSecond / maxSpeedMetersPerSecond);
-       // double speed = MathUtil.clamp(desiredState.speedMetersPerSecond, -1, 1);
-        
-        //driveController.setSetpoint(speed * 12, ControlType.kVelocity);
-
+        double driveOutput = desiredState.speedMetersPerSecond / maxSpeedMetersPerSecond;
+        driveOutput = MathUtil.clamp(driveOutput, -1, 1);
+         driveMotor.set(driveOutput);
     }
 
     /**

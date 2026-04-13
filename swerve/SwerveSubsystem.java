@@ -35,6 +35,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -44,8 +45,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveSubsystem extends SubsystemBase {
     // Controls how fast the robot spins to match a certain heading
-    private PIDController turnController = new PIDController(0.5, 0.0, 0);
-    private PIDController translationController = new PIDController(5, 0, 0.0);
+    private PIDController turnController = new PIDController(0.1, 0.0, 0.01);
+    private PIDController translationController = new PIDController(0.5, 0, 0.01);//zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzaaaaq
     private LinearFilter turnFilter = LinearFilter.singlePoleIIR(0.1, 0.02);
     private RobotConfig robotConfig;
     public final SwerveConfig swerveConfig;
@@ -70,7 +71,7 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveConfig = config;
         this.m_field = field;
         
-        turnController.enableContinuousInput(-Math.PI,  Math.PI);//was 0, 2*PI
+        turnController.enableContinuousInput(0,  2*Math.PI);//was 0, 2*PI
         turnController.setTolerance(Math.PI / 15);
 
         initalizeSwerveModules();
@@ -269,70 +270,61 @@ His name is Jeremy...
      *                      -1 and 1).
      * @param ySpeed        Speed of the robot in the y direction (sideways).
      *                      (between -1 and 1)
-     * @param rot           Angular rate of the robot. (between -1 and 1)
+     * @param rotationSpeed           Angular rate of the robot. (between -1 and 1)
      * @param fieldRelative Whether the provided x and y speeds are relative to
      *                      the field.
      */
-    public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-        double magnitude = Math.sqrt(xSpeed * xSpeed + ySpeed * ySpeed);
-        //normalize the driving inputs if they are too large
-        if (magnitude > 1) {
+    public void drive(double xSpeed, double ySpeed, double rotationSpeed, boolean fieldRelative) {
+        xSpeed *= -1;
+        double magnitude = Math.sqrt(xSpeed*xSpeed + ySpeed*ySpeed);
+        if (Math.abs(xSpeed) > 1 || Math.abs(ySpeed) > 1) {
             xSpeed /= magnitude;
             ySpeed /= magnitude;
         }
-        //clamp the rotation between -1 and 1
-        rot = MathUtil.clamp(rot, -1, 1);
+        rotationSpeed = MathUtil.clamp(rotationSpeed, -1, 1);
 
-
-        SmartDashboard.putNumber("DriveX", xSpeed);
-        SmartDashboard.putNumber("DriveY", ySpeed);
-
-        //----------------The Great El's awesome code that I currently have commented out and marked for easy finding--------------------------
-
-        double rotatedX = xSpeed, rotatedY = ySpeed;
-        if (fieldRelative) {
-            double robotAngle = getHeading();
-
-            rotatedX = Math.cos(robotAngle) * xSpeed - ySpeed * Math.sin(robotAngle);
-            rotatedY = Math.sin(robotAngle) * xSpeed + ySpeed * Math.cos(robotAngle);
-            //rotate the drive inputs based on the robot angle
-        }
-        
         // apply the max speeds
-        rotatedX *= swerveConfig.maxSpeedMetersPerSecond();
-        rotatedY *= swerveConfig.maxSpeedMetersPerSecond();
-        rot *= swerveConfig.maxAngularVelocityRadiansPerSecond();
+        xSpeed *= swerveConfig.maxSpeedMetersPerSecond();
+        ySpeed *= swerveConfig.maxSpeedMetersPerSecond();
+        rotationSpeed *= swerveConfig.maxAngularVelocityRadiansPerSecond();
+        
+        double[] transformedX, transformedY, finalTransformed;
+        if(fieldRelative) {
+            double robotAngle = getHeading();
+            transformedX = new double[]{Math.cos(robotAngle) * xSpeed, Math.sin(robotAngle) * xSpeed}; //rotation matrix
+            transformedY = new double[]{-Math.sin(robotAngle)* ySpeed, Math.cos(robotAngle) * ySpeed};
+            finalTransformed = new double[]{transformedX[0] + transformedY[0], transformedX[1] + transformedY[1]}; //combine into 1
+        } else {
+            finalTransformed = new double[]{xSpeed, ySpeed};
+        }
 
-        SwerveModuleState[] swerveModuleStates = swerveConfig.driveKinematics().toSwerveModuleStates(
-            new ChassisSpeeds(rotatedX, rotatedY, rot)
+        var swerveModuleStates = swerveConfig.driveKinematics().toSwerveModuleStates(
+            ChassisSpeeds.discretize(
+                new ChassisSpeeds(finalTransformed[0], finalTransformed[1], rotationSpeed),
+                TimedRobot.kDefaultPeriod
+            )
         );
 
-        // SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, swerveConfig.maxSpeedMetersPerSecond());
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, new ChassisSpeeds(rotatedX, rotatedY, rot), 
-            swerveConfig.maxSpeedMetersPerSecond(), 
-            swerveConfig.maxSpeedMetersPerSecond(), 
-            swerveConfig.maxAngularVelocityRadiansPerSecond()
-        );
-
-        setModuleStates(swerveModuleStates);        
+        setModuleStates(swerveModuleStates);     
     }
 
 
     public void drive(double xSpeed, double ySpeed, double xHeading, double yHeading) {
         double headingAngle = Math.atan2(yHeading, xHeading) + Math.PI; // in radians
-        double turn = turnFilter.calculate(getHeading());
+        double turn = getHeading();
         SmartDashboard.putNumber("Updated Gyro", turn); //use turn rather than getheading for the filter
         drive(
                 xSpeed,
                 ySpeed,
                 xHeading == 0 && yHeading == 0 ? 0 : // so that when you stop pressing the right stick it'll stop
                                                      // spinning
-                        turnController.calculate(turn*100, headingAngle*100), //use turn rather than getheading for the filter
+                        turnController.calculate(turn, headingAngle), //use turn rather than getheading for the filter
                 true);
     }
 
     public void drive(ChassisSpeeds speeds, boolean fieldRelative) {
         drive(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond, fieldRelative);
+        //boolean trust_instincts = true;
     }
 
     /**
@@ -364,42 +356,6 @@ His name is Jeremy...
         boolean rotOnTarget = Math.abs(getHeading() - pose.getRotation().getRadians()) < 0.05;
         return xOnTarget && yOnTarget && rotOnTarget;
     });
-
-/*
-        Pose2d currentPose = getPose();
-        System.out.println(currentPose);
-         if (currentPose == null) {
-            System.out.println("currentpose is null");
-            return new RunCommand(()->System.out.println(currentPose));
-        }
-        PathConstraints constraints = new PathConstraints(
-           swerveConfig.maxSpeedMetersPerSecond(), 
-           0.5,
-           swerveConfig.maxAngularVelocityRadiansPerSecond(), 
-           0.5
-        );
-
-        // Command c = AutoBuilder.pathfindToPose(pose, constraints);
-        // c.addRequirements(this);
-        ArrayList<PathPoint> listPose = new ArrayList<PathPoint>();
-        listPose.add(new PathPoint(new Translation2d(currentPose.getX(), currentPose.getY())));
-        listPose.add(new PathPoint(new Translation2d(pose.getX(), pose.getY())));
-        PathPlannerPath path = PathPlannerPath.fromPathPoints(listPose, constraints, new GoalEndState(0, pose.getRotation()));
-    //    return c;
-        return new InstantCommand(()->System.out.println("STARTED"), this).andThen( new FollowPathCommand(
-            path,
-            this::getPose,
-            this::getChassisSpeeds,
-            (speeds, feedforwards) -> drive(speeds, false),
-            new PPHolonomicDriveController(new PIDConstants(0.5, 0, 0), new PIDConstants(0.5, 0, 0)),
-            robotConfig,
-            ()->{var alliance = DriverStation.getAlliance();
-                    if (alliance.isPresent() && !swerveConfig.isFieldSymmetric()) {//!swerveConfig.isFieldSymmetric()_is_the_culprit_I_think, I ran out of time to investigate
-                        return alliance.get() == DriverStation.Alliance.Red;
-                    }
-                    return false;},
-            this
-        ));*/
     }
 
     /**
@@ -437,7 +393,7 @@ His name is Jeremy...
      * @return the robot's heading in radians, from 0 to 2PI
      */
     public double getHeading() {
-        return swerveConfig.gyroscope().getRadians();
+        return getRotation().getRadians();
     }
 
     /**
@@ -455,7 +411,7 @@ His name is Jeremy...
                 this::getPose, // Robot pose supplier
                 this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
                 this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                (speeds, feedforwards) -> drive(new ChassisSpeeds(-speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, -speeds.omegaRadiansPerSecond), false), // Method that will drive the robot given ROBOT RELATIVE
+                (speeds, feedforwards) -> drive(new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, -speeds.omegaRadiansPerSecond), false), // Method that will drive the robot given ROBOT RELATIVE
                                                                 // ChassisSpeeds. Also optionally outputs individual
                                                                 // module feedforwards
                 new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for
@@ -478,30 +434,6 @@ His name is Jeremy...
                     return false;
                 },
                 this
-                //First of all, this comment doesn't explain what I am looking at.
-                //secondly, I think i figured it out, but we already have that (it's just written differently)
-                //If you are saying we need to delete the part before "this" and just make it false, then I agree
-                //actually we just need to make isFieldSymmetric false
-
-                //4EST NOTE: I think the fact that is FieldSymmetric is true
-                //means that it's not passing into the math, so yes, as you mentioned,
-                //we should make isFieldSymmetric false, or clarify it
-                //since the field literally is symmetric, but since we are saying it is true,
-                //the code isn't entering that If statement that I believe is neccesary fo the code working.
-
-                //The code below is just another, seemingly smoother way to write it, but it 
-                //didn't do anything at all to change the controls when I tested it.
-
-                //That's because it does the same thing... You said that yourself
-            
-                //----o        ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooouu-------WE SHOULD LOOK INTO THIS------------------,_I_THink_it_may_work_with_some_adjustment,_not_my_code
-                //// Reference to this subsystem to set requirements
-                //robotConfig,
-   // () -> DriverStation.getAlliance()
-        //.map(a -> a == DriverStation.Alliance.Red)
-       // .orElse(false),
-       //         this // Reference to this subsystem to set requirements
-       // );
         );
     }
 }
