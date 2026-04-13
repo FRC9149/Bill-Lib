@@ -39,7 +39,7 @@ public class DancePad {
     public Trigger onX() { return new Trigger(() -> getX()); }
     public Trigger onO() { return new Trigger(() -> getO()); }
     public Trigger onTri() { return new Trigger(() -> getTriangle()); }
-    public Trigger onSqr() { return new Trigger(() -> getSquare()); }
+    public Trigger onSquare() { return new Trigger(() -> getSquare()); }
     public Trigger onSelect() { return new Trigger(() -> getSelect()); }
     public Trigger onStart() { return new Trigger(() -> getStart()); }
     public Trigger onCenter() { return new Trigger(() -> getCenter()); }
