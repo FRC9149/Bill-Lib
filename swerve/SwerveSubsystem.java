@@ -45,7 +45,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveSubsystem extends SubsystemBase {
     // Controls how fast the robot spins to match a certain heading
-    private PIDController turnController = new PIDController(0.1, 0.0, 0.01);
+    private PIDController turnController = new PIDController(7, 2, 0);
     private PIDController translationController = new PIDController(0.5, 0, 0.01);//zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzaaaaq
     private LinearFilter turnFilter = LinearFilter.singlePoleIIR(0.1, 0.02);
     private RobotConfig robotConfig;

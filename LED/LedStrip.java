@@ -67,28 +67,37 @@ public class LedStrip extends SubsystemBase {
         return color;
     }
 
+    public Color COLOR(int rOne, int gOne, int bOne){
+        Color color = new Color(rOne, gOne, bOne);
+        return color;
+    }
+
 
     /**
      * Sets the leds that have in index equal to a number in the fibonacci sequence to a certain color
      */
-    public void fibonacciSequence(int r, int g, int b) {
-        setAll(0, 0, 0);
-        int a = 0;
-        int c = 1;
-        
-        while(true) {
-            int next = a + c;
-            a = c;
-            c = next;
+     public void LED_fibonacci_sequence(int r, int g, int b) {
 
-            if (c <= ledBuffer.getLength()){
-                setLed(c, r, g, b);
-            } else {
-                return;
+        int i;
+        for (i = 0; i <= ledBuffer.getLength(); i++) {
+            int the_index;
+            int a = 0;
+            int c = 1;
+            if (i == 0) {
+                the_index = 0;
             }
+            for (int n = 2; n <= i; n++) {
+                int next = a + c;
+                a = c;
+                c = next;
+            }
+            the_index = c;
+            if (the_index <= ledBuffer.getLength()){
+            setLed(the_index, r, g, b);
         }
 
     }
+}
 
 
     /** Takes in a BiConsumer that gets applied to all the led pixels.
@@ -136,41 +145,61 @@ public class LedStrip extends SubsystemBase {
         led.setData(ledBuffer);
     }
 
+    public LEDPattern make_gradient(Color... colors){LEDPattern pattern = LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, colors); return pattern;}
+
+
+    public LEDPattern reverse(LEDPattern base) {
+        LEDPattern pattern = base.reversed();
+        
+        return applyBrightness(pattern);
+     }
+
+     public LEDPattern scroll(LEDPattern base, double percentage_of_strip) {
+        LEDPattern pattern = base.scrollAtRelativeSpeed(Percent.per(Second).of(percentage_of_strip));
+        return applyBrightness(pattern);
+    }
+
     public LEDPattern progressMask(LEDPattern base, DoubleSupplier percentage) {
         LEDPattern mask = LEDPattern.progressMaskLayer(percentage);
         return base.mask(mask);
     }
 
-    public LEDPattern gradient(Color... colors){
-        LEDPattern pattern = LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, colors); 
-        return applyBrightness(pattern);
-    }
-
-    public LEDPattern blinkingGradient(double breathingTime, Color... colors){
-        LEDPattern base = LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, colors);
-        return base.blink(Seconds.of(breathingTime));
-    }
-
-    public LEDPattern blinking(LEDPattern base, double blinkingTime) {
-        return base.blink(Seconds.of(blinkingTime));
-    }
-
-    public LEDPattern blinkingGradient(double onTime, double offTime, Color... colors){
-        LEDPattern base = LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, colors);
+    public LEDPattern blinking(double onTime, double offTime, LEDPattern base) {
         return base.blink(Seconds.of(onTime), Seconds.of(offTime));
     }
 
+    public LEDPattern blinking( double blinkingTime, LEDPattern base) {
+        return base.blink(Seconds.of(blinkingTime));
+    }
     /**
      * @param signal When this supplier returns true, the gradient will be on, and off when false
      * @param colors a set of colors that will be used in the gradient
      * @return a pattern that will blink the given gradient based on the signal
      */
-    public LEDPattern blinkingGradient(BooleanSupplier signal, Color... colors){
+    public LEDPattern blinking(BooleanSupplier signal, LEDPattern base){
+        return base.synchronizedBlink(signal);
+    }
+
+    public LEDPattern breathing(double breathingTime, LEDPattern base) {
+        return base.breathe(Seconds.of(breathingTime));
+    }
+
+    public LEDPattern make_blinking_gradient(double breathingTime, Color... colors){
+        LEDPattern base = LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, colors);
+        return base.blink(Seconds.of(breathingTime));
+    }
+    /**
+     * @param signal When this supplier returns true, the gradient will be on, and off when false
+     * @param colors a set of colors that will be used in the gradient
+     * @return a pattern that will blink the given gradient based on the signal
+     */
+    public LEDPattern make_blinking_gradient(BooleanSupplier signal, Color... colors){
         LEDPattern base = LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, colors);
         return base.synchronizedBlink(signal);
     }
 
-    public LEDPattern breathingGradient(double breathingTime, Color... colors){
+
+    public LEDPattern make_breathing_gradient(double breathingTime, Color... colors){
         LEDPattern base = LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, colors);
         return base.breathe(Seconds.of(breathingTime));
     }
@@ -223,15 +252,12 @@ public class LedStrip extends SubsystemBase {
 */
 
 
-    public void prettyColors() {
-        LEDPattern pattern = blinking(
-            breathingGradient(9.0, rgbToColor(127,255,0), rgbToColor(75, 83, 32)).scrollAtRelativeSpeed(Percent.per(Second).of(11.786)), 
-            3.78654321
-        );
-        applyLEDPattern(pattern);
+    public void Prettycolors() {
+        LEDPattern pattern = blinking(3.78654321, scroll(make_breathing_gradient(9.0, COLOR(127,255,0, 75, 83, 32)), 11.786));
+     applyLEDPattern(pattern);
     }
-    public void flash() {
-        LEDPattern pattern = blinkingGradient(.1, rgbToColor(255,255,255));
+    public void Flash() {
+        LEDPattern pattern = make_blinking_gradient(.1, COLOR(255,255,255));
         applyLEDPattern(pattern);
     }
     public void solidNavy() {
@@ -242,6 +268,44 @@ public class LedStrip extends SubsystemBase {
     }
     public void solidIvyGreen() {
         setAll(0,106,91);
+    }
+
+
+
+
+//==========================SECRET NO NO LOOKY AREA=====================================================
+public Color[] COLOR(int rOne, int gOne, int bOne, int rTwo, int gTwo, int bTwo) {
+        Color color_one = new Color(rOne, gOne, bOne);
+        Color color_two = new Color(rTwo, gTwo, bTwo);
+        Color[] color_array = {color_one, color_two};
+        return color_array;
+    }
+
+    public Color[] COLOR(int rOne, int gOne, int bOne, int rTwo, int gTwo, int bTwo, int rThree, int gThree, int bThree) {
+        Color color_one = new Color(rOne, gOne, bOne);
+        Color color_two = new Color(rTwo, gTwo, bTwo);
+        Color color_three = new Color(rThree, gThree, bThree);
+        Color[] color_array = {color_one, color_two, color_three};
+        return color_array;
+    }
+
+    public Color[] COLOR(int rOne, int gOne, int bOne, int rTwo, int gTwo, int bTwo, int rThree, int gThree, int bThree, int rFour, int gFour, int bFour) {
+        Color color_one = new Color(rOne, gOne, bOne);
+        Color color_two = new Color(rTwo, gTwo, bTwo);
+        Color color_three = new Color(rThree, gThree, bThree);
+        Color color_four = new Color(rFour, gFour, bFour);
+        Color[] color_array = {color_one, color_two, color_three, color_four};
+        return color_array;
+    }
+
+        public Color[] COLOR(int rOne, int gOne, int bOne, int rTwo, int gTwo, int bTwo, int rThree, int gThree, int bThree, int rFour, int gFour, int bFour, int rFive, int gFive, int bFive) {
+        Color color_one = new Color(rOne, gOne, bOne);
+        Color color_two = new Color(rTwo, gTwo, bTwo);
+        Color color_three = new Color(rThree, gThree, bThree);
+        Color color_four = new Color(rFour, gFour, bFour);
+        Color color_five = new Color(rFive, gFive, bFive);
+        Color[] color_array = {color_one, color_two, color_three, color_four, color_five};
+        return color_array;
     }
 
 }

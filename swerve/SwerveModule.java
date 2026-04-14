@@ -85,8 +85,8 @@ public class SwerveModule {
         driveConfig.idleMode(IdleMode.kBrake);
         
         driveConfig.inverted(motorReversed);
-        driveConfig.smartCurrentLimit(80, 80);
-        driveConfig.closedLoopRampRate(0.1);
+        driveConfig.smartCurrentLimit(40, 40);
+        driveConfig.closedLoopRampRate(0.01);
 
         driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -100,11 +100,11 @@ public class SwerveModule {
         turnConfig.idleMode(IdleMode.kBrake);
         turnConfig.encoder.positionConversionFactor(1/21.42857143);
         turnConfig.encoder.velocityConversionFactor(1);
-        turnConfig.smartCurrentLimit(80, 80);
+        turnConfig.smartCurrentLimit(40, 40);
 
         ClosedLoopConfig turnControllerConfig = new ClosedLoopConfig();
         turnControllerConfig.pid(0.5, 0, 0.1);
-        turnControllerConfig.positionWrappingInputRange(-0.75, 0.75);
+        turnControllerConfig.positionWrappingInputRange(-1, 1); // was -0.75, 0.75
         turnControllerConfig.positionWrappingEnabled(true);
         turnConfig.closedLoop.apply(turnControllerConfig);
 
