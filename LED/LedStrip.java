@@ -1,6 +1,8 @@
 package com.robocats.LED;
 
 import java.sql.Driver;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
@@ -61,10 +63,19 @@ public class LedStrip extends SubsystemBase {
 
     /**
      * Turns rgb values into a Color object that is usable by LedPatterns
-    */
-    private Color rgbToColor(int r, int g, int b){
-        Color color = new Color(r, g, b);
-        return color;
+     * @param rgb A list of rgb values in groups of 3 that represent 1 color in the Color array
+     * @return An array of Color objects that is 1/3 the length of the input array
+     */
+    private Color[] rgbToColor(int... rgb) {
+        List<Color> colors = new ArrayList<Color>();
+        if(rgb.length % 3 != 0) {
+            return new Color[0];
+        }
+
+        for (int i = 0; i < rgb.length; i += 3) {
+            colors.add(new Color(rgb[i], rgb[i + 1], rgb[i + 2]));
+        }
+        return colors.toArray(new Color[colors.size()]);
     }
 
 
@@ -76,16 +87,12 @@ public class LedStrip extends SubsystemBase {
         int a = 0;
         int c = 1;
         
-        while(true) {
+        for(; c < ledBuffer.getLength(); ) {
             int next = a + c;
             a = c;
             c = next;
 
-            if (c <= ledBuffer.getLength()){
-                setLed(c, r, g, b);
-            } else {
-                return;
-            }
+            setLed(c, r, g, b);
         }
 
     }
@@ -182,6 +189,7 @@ public class LedStrip extends SubsystemBase {
     public void setAllianeColor(Color defaultColor) {
         var alliance = DriverStation.getAlliance();
         if (!alliance.isPresent()) {
+            setAll((int)(defaultColor.red * 255), (int)(defaultColor.green * 255), (int)(defaultColor.blue * 255));
             return;
         }
         switch(alliance.get()) {
