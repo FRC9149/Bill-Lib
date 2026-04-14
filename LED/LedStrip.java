@@ -236,7 +236,7 @@ public class LedStrip extends SubsystemBase {
 
     public void prettyColors() {
         LEDPattern pattern = blinking(
-            breathingGradient(9.0, rgbToColor(127,255,0), rgbToColor(75, 83, 32)).scrollAtRelativeSpeed(Percent.per(Second).of(11.786)), 
+            breathingGradient(9.0, rgbToColor(127,255,0, 75, 83, 31)).scrollAtRelativeSpeed(Percent.per(Second).of(11.786)), 
             3.78654321
         );
         applyLEDPattern(pattern);
