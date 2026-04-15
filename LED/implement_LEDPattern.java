@@ -1,13 +1,9 @@
-//Why hello there, this is simply a txt file until I can get to a computer where I can check for errors and stuff.
-//Thank you for your patience, reader.
-//P.S. Grammarly is fighting me.
+
 package com.robocats.LED;
 
-import java.sql.Driver;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.function.BiConsumer;
+
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
@@ -19,12 +15,12 @@ import static edu.wpi.first.units.Units.Second;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 
 
 
 
-public static class implement_LEDPattern {
+
+public class implement_LEDPattern {
 
 
   //I just like the uppercase. This already exists, but let's call this bonus DLC

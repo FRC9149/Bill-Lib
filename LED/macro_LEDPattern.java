@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 
 
 
-public static class macro_LEDPattern {
+public class macro_LEDPattern {
 
   //Are we gonna address the elephant in the code?
 

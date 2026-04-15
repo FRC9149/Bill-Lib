@@ -10,6 +10,9 @@ import java.util.function.DoubleSupplier;
 
 import static edu.wpi.first.units.Units.Seconds;
 
+import com.robocats.LED.implement_LEDPattern;
+import com.robocats.LED.macro_LEDPattern;
+
 import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Second;
 
