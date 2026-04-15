@@ -103,7 +103,7 @@ public class SwerveModule {
         turnConfig.smartCurrentLimit(40, 40);
 
         ClosedLoopConfig turnControllerConfig = new ClosedLoopConfig();
-        turnControllerConfig.pid(0.5, 0, 0.1);
+        turnControllerConfig.pid(5, 0, 0);
         turnControllerConfig.positionWrappingInputRange(-1, 1); // was -0.75, 0.75
         turnControllerConfig.positionWrappingEnabled(true);
         turnConfig.closedLoop.apply(turnControllerConfig);

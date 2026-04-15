@@ -17,6 +17,9 @@ import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -64,6 +67,26 @@ public class LimelightCamera extends SubsystemBase implements AprilCamera {
         }
 
         return faceTagController.calculate(closest.txnc, 0);
+    }
+
+    //doesn't work right now
+    public double getDistance(String limelight, double limelightAngle, double limelightLensHeightInches, double goalHeight){
+
+        NetworkTable table = NetworkTableInstance.getDefault().getTable(limelight);
+    NetworkTableEntry ty = table.getEntry("ty");
+    double targetOffsetAngle_Vertical = ty.getDouble(0.0);
+
+    // how many degrees back is your limelight rotated from perfectly vertical?
+    double limelightMountAngleDegrees = limelightAngle; 
+
+
+    double angleToGoalDegrees = limelightMountAngleDegrees + targetOffsetAngle_Vertical;
+    double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
+
+    //calculate distance
+    double distanceFromLimelightToGoalInches = (goalHeight - limelightLensHeightInches) / Math.tan(angleToGoalRadians);
+
+    return distanceFromLimelightToGoalInches ;
     }
 
     public void screenshot() {
