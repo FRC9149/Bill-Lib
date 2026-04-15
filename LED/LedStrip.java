@@ -148,9 +148,8 @@ public class LedStrip extends SubsystemBase {
         return base.mask(mask);
     }
 
-    public LEDPattern gradient(Color... colors){
-        LEDPattern pattern = LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, colors); 
-        return applyBrightness(pattern);
+    public LEDPattern gradient(Color... colors){ 
+        return LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, colors);
     }
 
     public LEDPattern blinkingGradient(double breathingTime, Color... colors){
