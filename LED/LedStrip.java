@@ -68,7 +68,7 @@ public class LedStrip extends SubsystemBase {
      * @param rgb A list of rgb values in groups of 3 that represent 1 color in the Color array
      * @return An array of Color objects that is 1/3 the length of the input array
      */
-    private Color[] rgbToColor(int... rgb) {
+    public Color[] rgbToColor(int... rgb) {
         List<Color> colors = new ArrayList<Color>();
         if(rgb.length % 3 != 0) {
             return new Color[0];

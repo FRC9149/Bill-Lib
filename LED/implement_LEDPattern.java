@@ -24,7 +24,7 @@ public class implement_LEDPattern {
 
 
   //I just like the uppercase. This already exists, but let's call this bonus DLC
-    private Color[] COLOR(int... rgb) {
+    private static Color[] COLOR(int... rgb) {
         List<Color> colors = new ArrayList<Color>();
         if(rgb.length % 3 != 0) {
             return new Color[0];
@@ -39,36 +39,36 @@ public class implement_LEDPattern {
   //======================implement options===================================================
     //A---
     //B---
-    public LEDPattern implement_blinking(double blinkingTime, LEDPattern base) {
+    public static LEDPattern implement_blinking(double blinkingTime, LEDPattern base) {
         return base.blink(Seconds.of(blinkingTime));
     }
 
-    public LEDPattern implement_blinking(double onTime, double offTime, LEDPattern base) {
+    public static LEDPattern implement_blinking(double onTime, double offTime, LEDPattern base) {
         return base.blink(Seconds.of(onTime), Seconds.of(offTime));
     }
 
-    public LEDPattern implement_blinking(BooleanSupplier signal, LEDPattern base){
+    public static LEDPattern implement_blinking(BooleanSupplier signal, LEDPattern base){
         return base.synchronizedBlink(signal);
     }
   
-    public LEDPattern implement_breathing(double breathingTime, LEDPattern base) {
+    public static LEDPattern implement_breathing(double breathingTime, LEDPattern base) {
         return base.breathe(Seconds.of(breathingTime));
     }
 
     //C-O---
     //P---
-    public LEDPattern implement_progressMask(DoubleSupplier percentage, LEDPattern base) {
+    public static LEDPattern implement_progressMask(DoubleSupplier percentage, LEDPattern base) {
         LEDPattern mask = LEDPattern.progressMaskLayer(percentage);
         return base.mask(mask);
     }
   
     //R---
-    public LEDPattern implement_reverse(LEDPattern base) {
+    public static LEDPattern implement_reverse(LEDPattern base) {
         return base.reversed();
      }
 
     //S---
-     public LEDPattern implement_scroll(double percentage_of_strip, LEDPattern base) {
+     public static LEDPattern implement_scroll(double percentage_of_strip, LEDPattern base) {
         return base.scrollAtRelativeSpeed(Percent.per(Second).of(percentage_of_strip));
     }
     
