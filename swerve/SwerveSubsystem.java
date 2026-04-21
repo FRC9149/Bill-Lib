@@ -88,14 +88,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void addCamera(int i, AprilCamera cam) {
-        camera.add(i, cam); //TODO COMP - in order of priority -∞ == most important && ∞ == least important
-        // 0 - make sure we are using multiple cameras properly - when we use both cameras we get the pose from the limelight 4 - when we use 1 we get the pose from the one we see
-        // 1 - make sure the back side limelight is configured correctly (currently it thinks it's on the ground) CHECKMARK
-        // 2 - tune the turning pid controller
-        // 3 - Make waypoints switch based on which alliance we are on since they are field relative instead of driverstation relative
-        // -1 - win
-        // -2 - have fun
-        // ∞ - lose
+        camera.add(i, cam);
     }
 
     private void initalizeSwerveModules() {

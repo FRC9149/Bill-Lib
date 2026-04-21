@@ -37,11 +37,11 @@ public class LedStrip extends SubsystemBase {
      * @param length How many LEDs are on the strip
      */
     public LedStrip(int port, int length) {
-        led = new AddressableLED(port);
-        ledBuffer = new AddressableLEDBuffer(length);
-        led.setLength(length);
-
-        led.start();
+        // led = new AddressableLED(port);
+        // ledBuffer = new AddressableLEDBuffer(length);
+        // led.setLength(length);
+// 
+        // led.start();
     }
 
     /** Sets a led to a certain color
@@ -51,8 +51,8 @@ public class LedStrip extends SubsystemBase {
      * @param b The Blue value 0-255
      */
     public void setLed(int index, int r, int g, int b) {
-        ledBuffer.setRGB(index, r, g, b);
-        led.setData(ledBuffer);
+        // ledBuffer.setRGB(index, r, g, b);
+        // led.setData(ledBuffer);
     }
 
     /**
@@ -69,15 +69,16 @@ public class LedStrip extends SubsystemBase {
      * @return An array of Color objects that is 1/3 the length of the input array
      */
     public Color[] rgbToColor(int... rgb) {
-        List<Color> colors = new ArrayList<Color>();
-        if(rgb.length % 3 != 0) {
-            return new Color[0];
-        }
-
-        for (int i = 0; i < rgb.length; i += 3) {
-            colors.add(new Color(rgb[i], rgb[i + 1], rgb[i + 2]));
-        }
-        return colors.toArray(new Color[colors.size()]);
+        // List<Color> colors = new ArrayList<Color>();
+        // if(rgb.length % 3 != 0) {
+            // return new Color[0];
+        // }
+// 
+        // for (int i = 0; i < rgb.length; i += 3) {
+            // colors.add(new Color(rgb[i], rgb[i + 1], rgb[i + 2]));
+        // }
+        // return colors.toArray(new Color[colors.size()]);
+        return null;
     }
 
 
@@ -85,18 +86,18 @@ public class LedStrip extends SubsystemBase {
      * Sets the leds that have in index equal to a number in the fibonacci sequence to a certain color
      */
     public void fibonacciSequence(int r, int g, int b) {
-        setAll(0, 0, 0);
-        int a = 0;
-        int c = 1;
-        
-        for(; c < ledBuffer.getLength(); ) {
-            int next = a + c;
-            a = c;
-            c = next;
-
-            setLed(c, r, g, b);
-        }
-
+        // setAll(0, 0, 0);
+        // int a = 0;
+        // int c = 1;
+        // 
+        // for(; c < ledBuffer.getLength(); ) {
+            // int next = a + c;
+            // a = c;
+            // c = next;
+// 
+            // setLed(c, r, g, b);
+        // }
+// 
     }
 
 
@@ -105,18 +106,18 @@ public class LedStrip extends SubsystemBase {
      */
     public void foreach(BiConsumer<Integer, int[]> f) {
         //for all the led's in the class
-        for (int i = 0; i < ledBuffer.getLength(); i++) {
+        // for (int i = 0; i < ledBuffer.getLength(); i++) {
             //consume the index and rgb value of the current led
-            f.accept(
-                i, 
-                //new array of each color
-                new int[]{
-                    ledBuffer.getRed(i), 
-                    ledBuffer.getGreen(i), 
-                    ledBuffer.getBlue(i)
-                }
-            );
-        }
+            // f.accept(
+                // i, 
+                // new array of each color
+                // new int[]{
+                    // ledBuffer.getRed(i), 
+                    // ledBuffer.getGreen(i), 
+                    // ledBuffer.getBlue(i)
+                // }
+            // );
+        // }
     }
 
     /** Applys a pattern to the led buffer
@@ -124,8 +125,8 @@ public class LedStrip extends SubsystemBase {
      */
     public void applyLEDPattern(LEDPattern pattern) {
         applyBrightness(pattern);
-        pattern.applyTo(ledBuffer);
-        led.setData(ledBuffer);
+        // pattern.applyTo(ledBuffer);
+        // led.setData(ledBuffer);
     }
 
     private LEDPattern applyBrightness(LEDPattern pattern) {
@@ -139,10 +140,10 @@ public class LedStrip extends SubsystemBase {
      * sets all the leds to a certain color
      */
     public void setAll(int r, int g, int b) {
-        for (int index = 0; index < ledBuffer.getLength(); index++) {
-            ledBuffer.setRGB(index, r, g, b);
-        }
-        led.setData(ledBuffer);
+        // for (int index = 0; index < ledBuffer.getLength(); index++) {
+            // ledBuffer.setRGB(index, r, g, b);
+        // }
+        // led.setData(ledBuffer);
     }
 
     public LEDPattern progressMask(LEDPattern base, DoubleSupplier percentage) {
